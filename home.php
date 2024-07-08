@@ -17,7 +17,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
                 <a style="color: white !important;" class="navbar-brand" href="#"> <img style="height: 75px;" src="images/home/pet-logo.png" alt="">
-                    PET-CONNECT</a>
+                    Pet-Ko.</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -131,33 +131,127 @@
 
     <div class="container px-4 py-5" id="custom-cards">
         <div class="container px-4 py-5" id="featured-3">
-            <h2 class="pb-2 border-bottom">Pet Care Tips</h2>
+            <h2 class="pb-2" style="text-align: center;">Pet Care Tips</h2>
             <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-                <div class="feature col">
-                    <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient fs-2 mb-3">
-                        <img src="images/pet-care/dog.svg" alt="Pets Icon" width="32" height="32">
+                <div class="col">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body py-4">
+                            <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
+                                <img src="images/pet-care/dog.svg" alt="Dog Icon" width="32" height="32">
+                            </div>
+                            <h3 class="fs-4 text-body-emphasis mt-3">Grooming</h3>
+                            <p class="card-text">Regular grooming keeps your pet clean and healthy.</p>
+                        </div>
                     </div>
-                    <h3 class="fs-2 text-body-emphasis">Grooming</h3>
-                    <p>Regular grooming keeps your pet clean and healthy.</p>
                 </div>
-                <div class="feature col">
-                    <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient fs-2 mb-3">
-                        <img src="images/pet-care/foot.svg" alt="Pets Icon" width="32" height="32">
+                <div class="col">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body py-4">
+                            <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
+                                <img src="images/pet-care/foot.svg" alt="Foot Icon" width="32" height="32">
+                            </div>
+                            <h3 class="fs-4 text-body-emphasis mt-3">Exercise</h3>
+                            <p class="card-text">Provide daily exercise to keep your pet active and fit.</p>
+                        </div>
                     </div>
-                    <h3 class="fs-2 text-body-emphasis">Exercise</h3>
-                    <p>Provide daily exercise to keep your pet active and fit.</p>
                 </div>
-                <div class="feature col">
-                    <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient fs-2 mb-3">
-                        <img src="images/pet-care/cat.svg" alt="Pets Icon" width="32" height="32">
+                <div class="col">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body py-4">
+                            <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
+                                <img src="images/pet-care/cat.svg" alt="Cat Icon" width="32" height="32">
+                            </div>
+                            <h3 class="fs-4 text-body-emphasis mt-3">Nutrition</h3>
+                            <p class="card-text">Feed your pet a balanced diet suitable for their age.</p>
+                        </div>
                     </div>
-                    <h3 class="fs-2 text-body-emphasis">Nutrition</h3>
-                    <p>Feed your pet a balanced diet suitable for their age.</p>
                 </div>
             </div>
         </div>
 
-        <h2 class="pb-2 border-bottom">List of Available Pets</h2>
+        <h2 class="pb-2 mb-5">News & Announcement</h2>
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                <h3 class="card-title">Title</h3>
+                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
+                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
+                                <a href="#" class="stretched-link">Continue reading</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                <h3 class="card-title">Title</h3>
+                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
+                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
+                                <a href="#" class="stretched-link">Continue reading</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                <h3 class="card-title">Title</h3>
+                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
+                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
+                                <a href="#" class="stretched-link">Continue reading</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                <h3 class="card-title">Title</h3>
+                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
+                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
+                                <a href="#" class="stretched-link">Continue reading</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <a style="display: flex; align-items: center; justify-content: center;" href="">View all</a>
+
+        <br>
+        <br>
+        <br>
+
+        <h2 class="pb-2">List of Available Pets</h2>
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
 
             <div class="col">
@@ -183,6 +277,7 @@
                                 <small>Today</small>
                             </li>
                         </ul>
+                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
                     </div>
                 </div>
             </div>
@@ -210,6 +305,7 @@
                                 <small>Today</small>
                             </li>
                         </ul>
+                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
                     </div>
                 </div>
             </div>
@@ -237,17 +333,19 @@
                                 <small>Today</small>
                             </li>
                         </ul>
+                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
                     </div>
                 </div>
             </div>
         </div>
+        <a style="display: flex; align-items: center; justify-content: center;" href="">View all</a>
     </div>
 
     <!-- FOOTER -->
-    <footer id="footer" class="bg-dark text-white py-4">
+    <footer id="footer" style="background-color: #704130 !important;" class="bg-dark text-white py-4">
         <div class="container text-center">
-            <p>&copy; 2024 Russel Vincent Cuevas</p>
-            <p>Contact us at info@russelcuevas0@gmail.com</p>
+            <p>&copy; 2024 Russel Vincent Cuevas, John Dave De Leon, Archie De Vera</p>
+            <p>Contact us at info@petkosystem</p>
         </div>
     </footer>
 

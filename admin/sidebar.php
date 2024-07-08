@@ -70,12 +70,21 @@
             <p>Adoptions</p>
           </a>
         </li>
+
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#base">
+            <i class="fas fa-bookmark"></i>
+            <p>News & Announcement</p>
+          </a>
+        </li>
+
         <li class="nav-item">
           <a data-bs-toggle="collapse" href="#base">
             <i class="far fa-chart-bar"></i>
             <p>Reports</p>
           </a>
         </li>
+
 
         <li class="nav-item">
           <a data-bs-toggle="collapse" href="#base">

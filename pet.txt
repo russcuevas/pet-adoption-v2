@@ -46,7 +46,16 @@ created_at
 tbl_adoption
 user_id
 pet_id
-remarks -> 
+remarks -> Approve by other user or Rejected
+created_at
+updated_at
+
+
+tbl_news_announcement
+event_id
+event_image
+event_schedule
+event_description
 created_at
 updated_at
 
