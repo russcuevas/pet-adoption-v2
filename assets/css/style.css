@@ -1,0 +1,85 @@
+/* HOME PAGE */
+.home-section {
+    background: linear-gradient(to right, rgb(242, 235, 235), rgb(158, 97, 50));
+    height: 100vh;
+}
+
+.navbar-toggler {
+    background-color: black !important;
+    color: white;
+}
+
+.nav-link {
+    color: white !important;
+    font-weight: bold !important;
+    text-decoration: none;
+    transition: text-decoration 0.3s;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.nav-link.active {
+    text-decoration: underline;
+}
+
+.banner-section {
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 0;
+}
+
+.banner-text {
+    max-width: 50%;
+}
+
+.banner-text h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.banner-text p {
+    font-size: 1.5rem;
+}
+
+.banner-img img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* END HOMEPAGE */
+
+
+/* RESPONSIVE SCREEN */
+@media (max-width: 768px) {
+
+    /* HOME PAGE */
+    .h1-home {
+        text-align: left;
+    }
+
+    .home-p {
+        font-size: 15px !important;
+    }
+
+    .home-section {
+        height: 100vh;
+    }
+
+    .banner-section {
+        height: 50vh;
+        text-align: center;
+    }
+
+    .banner-text {
+        max-width: 100%;
+        margin-bottom: 30px;
+    }
+
+    /* END PAGE */
+
+}
