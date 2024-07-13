@@ -31,7 +31,7 @@
             <div class="container">
                 <div class="page-inner">
                     <div class="page-header">
-                        <h3 class="fw-bold mb-3">Pet Management</h3>
+                        <h3 class="fw-bold mb-3">News & Announcement</h3>
                         <ul class="breadcrumbs mb-3">
                             <li class="nav-home">
                                 <a href="dashboard.php">
@@ -42,7 +42,7 @@
                                 <i class="icon-arrow-right"></i>
                             </li>
                             <li class="nav-item">
-                                <span style="color: grey;">Pet Management</span>
+                                <span style="color: grey;">News & Announcement</span>
                             </li>
                         </ul>
                     </div>
@@ -55,7 +55,7 @@
                                         <h4 class="card-title"></h4>
                                         <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addRowModal">
                                             <i class="fa fa-plus"></i>
-                                            Add Pets
+                                            Add News & Announcement
                                         </button>
                                     </div>
                                 </div>
@@ -67,58 +67,35 @@
                                                 <form method="POST">
                                                     <div class="modal-header border-0">
                                                         <h5 class="modal-title">
-                                                            <span class="fw-mediumbold"> Add Pets</span>
+                                                            <span class="fw-mediumbold"> Add News & Announcement</span>
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="row">
-                                                            <input type="text" name="admin_id">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
-                                                                    <label>Pet Image</label><br>
+                                                                    <label>Image</label><br>
                                                                     <input type="file"><br><br>
                                                                     <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label>Pet Name</label>
+                                                                    <label>Title</label>
                                                                     <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you dont know*)</span></label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Type</label>
-                                                                    <select style="border: 2px solid grey;" class="form-select" id="exampleFormControlSelect1">
-                                                                        <option>Dog</option>
-                                                                        <option>Cat</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Breed</label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                                                    <label>Date</label>
+                                                                    <input style="border: 2px solid grey;" type="date" class="form-control" placeholder="" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-12">
                                                                 <div class="form-group">
-                                                                    <label for="petCondition">Pet Condition</label>
-                                                                    <select style="border: 2px solid grey;" class="form-select" id="petCondition" onchange="toggleInput()">
-                                                                        <option value="healthy">Healthy</option>
-                                                                        <option value="sick">In sick</option>
-                                                                    </select>
-                                                                    <div id="specificSickInput" style="display: none;">
-                                                                        <label for="specificSick">Specific sickness:</label>
-                                                                        <input style="border: 2px solid grey" type="text" class="form-control" id="specificSick" name="specificSick">
-                                                                    </div>
+                                                                    <label>Description</label>
+                                                                    <textarea class="form-control" name="" id="" style="border: 2px solid grey;"></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -139,11 +116,9 @@
                                             <thead>
                                                 <tr>
                                                     <th>Image</th>
-                                                    <th>Pet Name</th>
-                                                    <th>Pet Type</th>
-                                                    <th>Pet Breed</th>
-                                                    <th>Pet Description</th>
-                                                    <th>Pet Age</th>
+                                                    <th>Title</th>
+                                                    <th>Date</th>
+                                                    <th>Description</th>
                                                     <th style="width: 10%">Action</th>
                                                 </tr>
                                             </thead>
@@ -154,8 +129,6 @@
                                                     <td>Tiger</td>
                                                     <td>Dog</td>
                                                     <td>Labrador</td>
-                                                    <td>Bawal sa malamig</td>
-                                                    <td>15</td>
                                                     <td>
                                                         <div class="form-button-action">
                                                             <a href="" class="btn btn-link btn-primary btn-lg">
@@ -196,18 +169,6 @@
 
         <!-- Fonts and icons -->
         <script src="assets/js/plugin/webfont/webfont.min.js"></script>
-        <script>
-            function toggleInput() {
-                var selectBox = document.getElementById("petCondition");
-                var specificSickInput = document.getElementById("specificSickInput");
-
-                if (selectBox.value === "sick") {
-                    specificSickInput.style.display = "block";
-                } else {
-                    specificSickInput.style.display = "none";
-                }
-            }
-        </script>
         <script>
             WebFont.load({
                 google: {
