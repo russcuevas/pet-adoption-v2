@@ -114,7 +114,7 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Change profile</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Logout</a>
+                <a class="dropdown-item" href="admin_logout.php">Logout</a>
               </li>
             </div>
           </ul>

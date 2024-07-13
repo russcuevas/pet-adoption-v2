@@ -1,3 +1,16 @@
+<?php
+
+// INCLUDING CONNECTION TO DATABASE
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+  header('location:admin_login.php');
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 

@@ -1,3 +1,29 @@
+<?php
+include '../database/connection.php';
+
+// SESSION
+session_start();
+if (isset($_SESSION['admin_id'])) {
+    header('location:dashboard.php');
+}
+
+if (isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $password = sha1($_POST['password']);
+
+    $select_admin = $conn->prepare("SELECT * FROM `tbl_admin` WHERE email = ? AND password = ?");
+    $select_admin->execute([$email, $password]);
+    if ($select_admin->rowCount() > 0) {
+        $fetch_admin_id = $select_admin->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['admin_id'] = $fetch_admin_id['admin_id'];
+        header('location:dashboard.php');
+    } else {
+        $_SESSION['unsuccess'] = 'Incorrect email or password';
+        header('location:admin_login.php');
+        exit();
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -37,19 +63,19 @@
                         <div class="mb-4">
                             <h3>Sign In</h3>
                         </div>
-                        <form action="#" method="post">
+                        <form action="" method="post">
                             <div class="form-group first">
                                 <label for="email">Email</label>
-                                <input type="text" class="form-control" id="email">
+                                <input type="text" class="form-control" id="email" name="email">
 
                             </div>
                             <div class="form-group last mb-3">
                                 <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password">
+                                <input type="password" class="form-control" id="password" name="password">
 
                             </div>
 
-                            <input type="submit" value="Log In" class="btn btn-block btn-primary">
+                            <input type="submit" style="background-color: #704130; border: none;" name="login" value="Log In" class="btn btn-block btn-primary">
                         </form>
                     </div>
                 </div>
@@ -65,6 +91,20 @@
     <script src="login-assets/js/popper.min.js"></script>
     <script src="login-assets/js/bootstrap.min.js"></script>
     <script src="login-assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SWEETALERT -->
+    <?php
+    if (isset($_SESSION['unsuccess'])) {
+        echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: '" . $_SESSION['unsuccess'] . "',
+                });
+              </script>";
+        unset($_SESSION['unsuccess']);
+    }
+    ?>
 </body>
 
 </html>

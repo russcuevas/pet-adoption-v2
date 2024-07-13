@@ -19,6 +19,7 @@ tbl_admin
 admin_id
 email
 password
+address
 created_at
 updated_at
 

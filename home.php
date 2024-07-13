@@ -338,7 +338,7 @@
                 </div>
             </div>
         </div>
-        <a style="display: flex; align-items: center; justify-content: center;" href="">View all</a>
+        <a style="display: flex; align-items: center; justify-content: center;" href="adopt.php">View all</a>
     </div>
 
     <!-- FOOTER -->
