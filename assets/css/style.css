@@ -54,6 +54,14 @@
 /* END HOMEPAGE */
 
 
+/* ABOUTPAGE */
+.about-section {
+    height: 100vh;
+}
+
+/* END ABOUTPAGE */
+
+
 /* RESPONSIVE SCREEN */
 @media (max-width: 768px) {
 
@@ -81,5 +89,12 @@
     }
 
     /* END PAGE */
+
+    /* ABOUT PAGE */
+    .about-section {
+        height: 100vh;
+    }
+
+    /* END ABOUT */
 
 }
