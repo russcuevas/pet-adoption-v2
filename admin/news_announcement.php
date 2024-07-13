@@ -1,5 +1,4 @@
 <?php
-
 // INCLUDING CONNECTION TO DATABASE
 include '../database/connection.php';
 
@@ -67,11 +66,97 @@ if (isset($_POST['submit'])) {
         exit;
     }
 }
+// END CREATE NEWS & ANNOUNCEMENT
 
 // READ THE NEWS & ANNOUNCEMENT
 $get_news = "SELECT * FROM `tbl_news_announcement`";
 $get_stmt = $conn->query($get_news);
 $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+// END READ ANNOUNCEMENT
+
+// UPDATE THE NEWS & ANNOUNCEMENT
+if (isset($_POST['update'])) {
+    $event_id = $_POST['event_id'];
+    $title = $_POST['event_title'];
+    $date = $_POST['event_schedule'];
+    $description = $_POST['event_description'];
+
+    if (
+        $_FILES['event_image']['size'] > 0
+    ) {
+        $uploadDir = '../assets/event_image/';
+        $uploadFile = $uploadDir . basename($_FILES['event_image']['name']);
+        $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
+
+        $check = getimagesize($_FILES['event_image']['tmp_name']);
+        if ($check === false) {
+            $_SESSION['upload_error'] = "File is not an image.";
+            header('location: news_announcement.php');
+            exit;
+        }
+
+        if ($_FILES['event_image']['size'] > 5000000) {
+            $_SESSION['upload_error'] = "Sorry, your file is too large.";
+            header('location: news_announcement.php');
+            exit;
+        }
+
+        $allowedTypes = array(
+            'jpg', 'jpeg', 'png', 'gif'
+        );
+        if (!in_array(
+            $imageFileType,
+            $allowedTypes
+        )) {
+            $_SESSION['upload_error'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            header('location: news_announcement.php');
+            exit;
+        }
+
+        $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
+        $uploadFile = $uploadDir . $uniqueFileName;
+
+        if (!move_uploaded_file($_FILES['event_image']['tmp_name'], $uploadFile)) {
+            $_SESSION['upload_error'] = "Sorry, there was an error uploading your file.";
+            header('location: news_announcement.php');
+            exit;
+        }
+        $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_image = ? WHERE event_id = ?");
+        $update_query->execute([$uniqueFileName, $event_id]);
+    }
+
+    $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_title = ?, event_schedule = ?, event_description = ? WHERE event_id = ?");
+    $update_query->execute([$title, $date, $description, $event_id]);
+
+    if ($update_query) {
+        $_SESSION['upload_success'] = "News & Announcement updated successfully.";
+        header('location: news_announcement.php');
+        exit;
+    } else {
+        $_SESSION['upload_error'] = "Error updating announcement.";
+        header('location: news_announcement.php');
+        exit;
+    }
+}
+// END UPDATE ANNOUNCEMENT
+
+// DELETE NEWS AND ANNOUNCEMENT
+if (isset($_POST['delete'])) {
+    $event_id = $_POST['event_id'];
+    $delete_query = $conn->prepare("DELETE FROM tbl_news_announcement WHERE event_id = ?");
+    $delete_query->execute([$event_id]);
+
+    if ($delete_query) {
+        $_SESSION['delete_success'] = "Announcement deleted successfully.";
+        header('location: news_announcement.php');
+        exit;
+    } else {
+        $_SESSION['delete_error'] = "Error deleting announcement.";
+        header('location: news_announcement.php');
+        exit;
+    }
+}
+// END DELETE NEWS AND ANNOUNCEMENT
 ?>
 
 <!DOCTYPE html>
@@ -184,6 +269,7 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- ADD MODAL END -->
 
 
 
@@ -208,13 +294,92 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                         <td><?php echo $announcement['event_description'] ?></td>
                                                         <td>
                                                             <div class="form-button-action">
-                                                                <a href="" class="btn btn-link btn-primary btn-lg">
+                                                                <a href="" data-bs-toggle="modal" data-bs-target="#edit_<?php echo $announcement['event_id']; ?>" class="btn btn-link btn-primary btn-lg">
                                                                     <i class="fa fa-edit"></i>
                                                                 </a>
-                                                                <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
+                                                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $announcement['event_id']; ?>" class="btn btn-link btn-primary btn-lg">
                                                                     <i class="fa fa-times"></i>
                                                                 </a>
                                                             </div>
+
+                                                            <!-- EDIT MODAL -->
+                                                            <div class="modal fade" id="edit_<?php echo $announcement['event_id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form action="" method="POST" enctype="multipart/form-data">
+                                                                            <div class="modal-header border-0">
+                                                                                <h5 class="modal-title">
+                                                                                    <span class="fw-mediumbold"> Update News & Announcement</span>
+                                                                                </h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                <div class="row">
+                                                                                    <input type="hidden" name="event_id" value="<?php echo $announcement['event_id']; ?>">
+                                                                                    <div class="col-md-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>Current Image</label><br>
+                                                                                            <img style="height: 70px;" src="../assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Current Image">
+                                                                                        </div>
+
+                                                                                        <div class="form-group">
+                                                                                            <label>Update Image</label><br>
+                                                                                            <input type="file" name="event_image">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>Title</label>
+                                                                                            <input style="border: 2px solid grey;" type="text" class="form-control" name="event_title" value="<?php echo $announcement['event_title'] ?>" placeholder=" Enter title" required />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>Datetime</label>
+                                                                                            <input style="border: 2px solid grey;" type="datetime-local" class="form-control" name="event_schedule" value="<?php echo $announcement['event_schedule'] ?>" placeholder=" Select date" required />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-sm-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>Description</label>
+                                                                                            <textarea class="form-control" name="event_description" style="border: 2px solid grey;"><?php echo $announcement['event_description']; ?></textarea>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="modal-footer border-0">
+                                                                                <input type="submit" name="update" class="btn btn-primary" value="Save changes">
+                                                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- END EDIT MODAL -->
+
+                                                            <!-- DELETE MODAL -->
+                                                            <div class="modal fade" id="delete_<?php echo $announcement['event_id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form action="" method="POST">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title">Delete Announcement</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                <input type="hidden" name="event_id" value="<?php echo $announcement['event_id']; ?>">
+                                                                                <p>Are you sure you want to delete the announcement "<?php echo $announcement['event_title']; ?>"?</p>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-danger" name="delete">Delete</button>
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- END DELETE MODAL -->
+
                                                         </td>
                                                     </tr>
                                                 <?php endforeach ?>
@@ -250,6 +415,8 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- SWEETALERT -->
+
+        <!-- INSERT AND UPDATE -->
         <?php if (isset($_SESSION['upload_success'])) : ?>
             <script>
                 Swal.fire({
@@ -272,6 +439,31 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                 })
             </script>
             <?php unset($_SESSION['upload_error']); ?>;
+        <?php endif; ?>
+
+        <!-- DELETE -->
+        <?php if (isset($_SESSION['delete_success'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '<?php echo $_SESSION['delete_success']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['delete_success']); ?>;
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['delete_error'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '<?php echo $_SESSION['delete_error']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['delete_error']); ?>;
         <?php endif; ?>
         <!-- END SWEETALERT -->
 
