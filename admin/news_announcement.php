@@ -1,3 +1,79 @@
+<?php
+
+// INCLUDING CONNECTION TO DATABASE
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+// ADD NEWS & ANNOUNCEMENT QUERY
+if (isset($_POST['submit'])) {
+
+    $title = $_POST['event_title'];
+    $date = $_POST['event_schedule'];
+    $description = $_POST['event_description'];
+
+    $uploadDir = '../assets/event_image/';
+    $uploadFile = $uploadDir . basename($_FILES['event_image']['name']);
+    $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
+
+    if ($_FILES['event_image']['size'] > 0) {
+        $check = getimagesize($_FILES['event_image']['tmp_name']);
+        if ($check === false) {
+            $_SESSION['upload_error'] = "File is not an image.";
+            header('location: news_announcement.php');
+            exit;
+        }
+        if ($_FILES['event_image']['size'] > 5000000) {
+            $_SESSION['upload_error'] = "Sorry, your file is too large.";
+            header('location: news_announcement.php');
+            exit;
+        }
+        $allowedTypes = array('jpg', 'jpeg', 'png', 'gif');
+        if (!in_array($imageFileType, $allowedTypes)) {
+            $_SESSION['upload_error'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            header('location: news_announcement.php');
+            exit;
+        }
+
+        $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
+        $uploadFile = $uploadDir . $uniqueFileName;
+
+        if (!move_uploaded_file($_FILES['event_image']['tmp_name'], $uploadFile)) {
+            $_SESSION['upload_error'] = "Sorry, there was an error uploading your file.";
+            header('location: news_announcement.php');
+            exit;
+        }
+    } else {
+        $_SESSION['upload_error'] = "Please select an image file.";
+        header('location: news_announcement.php');
+        exit;
+    }
+
+    $insert_query = $conn->prepare("INSERT INTO tbl_news_announcement (event_image, event_title, event_schedule, event_description) VALUES (?, ?, ?, ?)");
+    $insert_query->execute([$uniqueFileName, $title, $date, $description]);
+
+    if ($insert_query) {
+        $_SESSION['upload_success'] = "News & Announcement added successfully.";
+        header('location: news_announcement.php');
+        exit;
+    } else {
+        $_SESSION['upload_error'] = "Error inserting data into database.";
+        header('location: news_announcement.php');
+        exit;
+    }
+}
+
+// READ THE NEWS & ANNOUNCEMENT
+$get_news = "SELECT * FROM `tbl_news_announcement`";
+$get_stmt = $conn->query($get_news);
+$announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,7 +140,7 @@
                                     <div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
-                                                <form method="POST">
+                                                <form action="" method="POST" enctype="multipart/form-data">
                                                     <div class="modal-header border-0">
                                                         <h5 class="modal-title">
                                                             <span class="fw-mediumbold"> Add News & Announcement</span>
@@ -76,32 +152,32 @@
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label>Image</label><br>
-                                                                    <input type="file"><br><br>
+                                                                    <input type="file" name="event_image" required><br><br>
                                                                     <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
                                                                     <label>Title</label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="event_title" placeholder="Enter title" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label>Date</label>
-                                                                    <input style="border: 2px solid grey;" type="date" class="form-control" placeholder="" required />
+                                                                    <label>Datetime</label>
+                                                                    <input style="border: 2px solid grey;" type="datetime-local" class="form-control" name="event_schedule" placeholder="Select date" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-12">
                                                                 <div class="form-group">
                                                                     <label>Description</label>
-                                                                    <textarea class="form-control" name="" id="" style="border: 2px solid grey;"></textarea>
+                                                                    <textarea class="form-control" name="event_description" style="border: 2px solid grey;" placeholder="Enter description"></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer border-0">
-                                                        <input type="submit" class="btn btn-primary" value="Add">
+                                                        <input type="submit" name="submit" class="btn btn-primary" value="Add">
                                                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                                                     </div>
                                                 </form>
@@ -117,30 +193,31 @@
                                                 <tr>
                                                     <th>Image</th>
                                                     <th>Title</th>
-                                                    <th>Date</th>
+                                                    <th>Date scheduled</th>
                                                     <th>Description</th>
                                                     <th style="width: 10%">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <?php foreach ($announcements as $announcement) : ?>
+                                                    <tr>
+                                                        <td><img style="height: 75px;" src="../assets/event_image/<?php echo $announcement['event_image'] ?>" alt=""></td>
 
-                                                <tr>
-                                                    <td><img style="height: 75px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt=""></td>
-                                                    <td>Tiger</td>
-                                                    <td>Dog</td>
-                                                    <td>Labrador</td>
-                                                    <td>
-                                                        <div class="form-button-action">
-                                                            <a href="" class="btn btn-link btn-primary btn-lg">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                                                <i class="fa fa-times"></i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
+                                                        <td><?php echo $announcement['event_title'] ?></td>
+                                                        <td><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></td>
+                                                        <td><?php echo $announcement['event_description'] ?></td>
+                                                        <td>
+                                                            <div class="form-button-action">
+                                                                <a href="" class="btn btn-link btn-primary btn-lg">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a>
+                                                                <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
+                                                                    <i class="fa fa-times"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -169,6 +246,35 @@
 
         <!-- Fonts and icons -->
         <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- SWEETALERT -->
+        <?php if (isset($_SESSION['upload_success'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '<?php echo $_SESSION['upload_success']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['upload_success']); ?>;
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['upload_error'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '<?php echo $_SESSION['upload_error']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['upload_error']); ?>;
+        <?php endif; ?>
+        <!-- END SWEETALERT -->
+
         <script>
             WebFont.load({
                 google: {
