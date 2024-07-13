@@ -62,6 +62,21 @@
 /* END ABOUTPAGE */
 
 
+/* NEWS AND ANNOUNCEMENT */
+.news-section {
+    height: 100vh;
+}
+
+/* END NEWS AND ANNOUNCEMENT */
+
+/* ADOPTPAGE */
+
+.adopt-section {
+    height: 100vh;
+}
+
+/* END ADOPT PAGE */
+
 /* RESPONSIVE SCREEN */
 @media (max-width: 768px) {
 
@@ -96,5 +111,19 @@
     }
 
     /* END ABOUT */
+
+    /* NEWS AND ANNOUNCEMENT */
+    .news-section {
+        height: 100vh;
+    }
+
+    /* END NEWS AND ANNOUNCEMENT */
+
+    /* ADOPT SECTION */
+    .adopt-section {
+        height: 100vh;
+    }
+
+    /* END ADOPT SECTION */
 
 }

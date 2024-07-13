@@ -30,10 +30,10 @@
                             <a class="nav-link" href="about.php">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#available_pet">Available Adopt</a>
+                            <a class="nav-link" href="adopt.php">Adopt</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#available_pet">News & Announcement</a>
+                            <a class="nav-link" href="news_announcement.php">News & Announcement</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#footer">Contact</a>
@@ -245,7 +245,7 @@
             </div>
 
         </div>
-        <a style="display: flex; align-items: center; justify-content: center;" href="">View all</a>
+        <a style="display: flex; align-items: center; justify-content: center;" href="news_announcement.php">View all</a>
 
         <br>
         <br>

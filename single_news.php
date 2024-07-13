@@ -27,7 +27,7 @@
                             <a class="nav-link" href="home.php">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="about.php">About</a>
+                            <a class="nav-link" href="about.php">About</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="adopt.php">Adopt</a>
@@ -109,48 +109,37 @@
         </div>
     </div>
 
-    <!-- NEWS & ANNOUNCEMENT SECTION -->
+    <!-- NEWS SECTION -->
     <div class="news-section">
         <div class="container">
-            <h1 class="mt-5" style="text-align: center;">About Us</h1>
-            <p class="lead" style="text-align: justify;">We are dedicated to rescuing and finding loving homes for abandoned and mistreated pets. Our commitment extends beyond adoption; we rehabilitate each animal, providing medical care, training, and affection until they are ready for their forever families. Through education and community outreach, we advocate for responsible pet ownership, striving to reduce homelessness among pets in our community. Our ultimate goal is to ensure every pet receives the love and care they deserve, creating happier lives for both animals and their human companions.</p>
-
-            <hr class="featurette-divider">
-
-            <!-- Mission Section -->
-            <div class="row featurette">
-                <div class="col-md-7">
-                    <h2 class="featurette-heading fw-normal lh-1">Mission</h2>
-                    <p class="lead" style="text-align: justify;">Our mission is to rescue and find loving homes for abandoned and mistreated pets. We strive to rehabilitate each animal, providing them with medical care, training, and affection until they are ready to be adopted into caring families. Through education and community outreach, we advocate for responsible pet ownership and strive to reduce the number of homeless pets in our community. Our ultimate goal is to ensure that every pet receives the love and care they deserve, creating happier lives for both animals and their human companions.</p>
-                </div>
-                <div class="col-md-5">
-                    <img src="https://i3.cpcache.com/product/977275538/pets_adoption_saves_lifes_banner.jpg?height=630&width=630&qv=90" class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" role="img" aria-label="Mission Image" alt="Mission Image">
+            <div class="p-4 p-md-5 mt-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+                <div class="col-lg-6 px-0">
+                    <h1 class="display-4 fst-italic">Title</h1>
                 </div>
             </div>
 
-            <hr class="featurette-divider">
+            <div class="row g-5">
+                <div class="col-md-8">
+                    <article class="blog-post">
+                        <h2 class="display-5 link-body-emphasis mb-1">Sample blog post</h2>
+                        <p class="blog-post-meta">January 1, 2021 by <a href="#">Mark</a></p>
 
-            <!-- Vision Section -->
-            <div class="row featurette">
-                <div class="col-md-7 order-md-2">
-                    <h2 class="featurette-heading fw-normal lh-1">Vision</h2>
-                    <p class="lead" style="text-align: justify;">Our vision is a world where every pet has a loving and caring home, free from neglect and cruelty. We envision communities where pet adoption is the preferred choice, where all pets are seen as valuable members of families. Through innovative programs and partnerships, we aim to create sustainable solutions to pet overpopulation and abandonment. By fostering a culture of compassion and responsibility, we believe we can make a significant impact on the lives of animals, ensuring they live in environments filled with love, respect, and dignity.</p>
-                </div>
-                <div class="col-md-5 order-md-1">
-                    <img src="https://i3.cpcache.com/product/977275538/pets_adoption_saves_lifes_banner.jpg?height=630&width=630&qv=90" class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" role="img" aria-label="Vision Image" alt="Vision Image">
+                        <p>This blog post shows a few different types of content that’s supported and styled with Bootstrap. Basic typography, lists, tables, images, code, and more are all supported as expected.</p>
+                        <hr>
+                        <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+                    </article>
                 </div>
             </div>
-
-            <hr class="featurette-divider">
         </div>
+    </div>
+    </div>
     </div>
 
 
 
 
-
     <!-- FOOTER -->
-    <footer id="footer" style="background-color: #704130 !important;" class="bg-dark text-white py-4">
+    <footer id="footer" style="background-color: #704130 !important;" class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
             <p>&copy; 2024 Russel Vincent Cuevas, John Dave De Leon, Archie De Vera</p>
             <p>Contact us at info@petkosystem</p>
