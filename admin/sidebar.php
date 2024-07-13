@@ -85,8 +85,8 @@
           </a>
         </li>
 
-        <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#base">
+        <li class="nav-item <?php if (basename($_SERVER['PHP_SELF']) == 'reports.php') echo 'active'; ?>">
+          <a href="reports.php">
             <i class="far fa-chart-bar"></i>
             <p>Reports</p>
           </a>

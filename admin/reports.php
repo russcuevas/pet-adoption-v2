@@ -31,7 +31,7 @@
             <div class="container">
                 <div class="page-inner">
                     <div class="page-header">
-                        <h3 class="fw-bold mb-3">Adoptions</h3>
+                        <h3 class="fw-bold mb-3">Reports</h3>
                         <ul class="breadcrumbs mb-3">
                             <li class="nav-home">
                                 <a href="dashboard.php">
@@ -42,7 +42,7 @@
                                 <i class="icon-arrow-right"></i>
                             </li>
                             <li class="nav-item">
-                                <span style="color: grey;">Adoptions</span>
+                                <span style="color: grey;">Reports</span>
                             </li>
                         </ul>
                     </div>
@@ -53,6 +53,10 @@
                                 <div class="card-header">
                                     <div class="d-flex align-items-center">
                                         <h4 class="card-title"></h4>
+                                        <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addRowModal">
+                                            <i class="fas fa-file-pdf"></i> &nbsp;
+                                            Export PDF
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -72,15 +76,12 @@
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <span><i class="fas fa-user-circle"></i> Russel Vincent Cuevas</span> <br>
-                                                        <span><i class="fa fa-map-marker"></i> Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span><i class="fa fa-phone"></i> 09495748302</span> <br>
-                                                        <span><i class="fa fa-envelope"></i> russelcuevas0@gmail.com</span>
+                                                        <span>Russel Vincent Cuevas</span> <br>
+                                                        <span>Calingatan Mataasnakahoy Batangas</span> <br>
+                                                        <span>09495748302</span> <br>
+                                                        <span>russelcuevas0@gmail.com</span>
                                                     </td>
                                                     <td>
-                                                        <span>
-                                                            <img style="height: 100px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
-                                                        </span><br>
                                                         <span>
                                                             Tiger
                                                         </span> <br>
@@ -95,16 +96,16 @@
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <span><i class="fas fa-user-circle"></i> Russel Vincent Cuevas</span> <br>
-                                                        <span><i class="fa fa-map-marker"></i> Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span><i class="fa fa-phone"></i> 09495748302</span> <br>
-                                                        <span><i class="fa fa-envelope"></i> russelcuevas0@gmail.com</span>
+                                                        <span>Russel Vincent Cuevas</span> <br>
+                                                        <span>Calingatan Mataasnakahoy Batangas</span> <br>
+                                                        <span>09495748302</span> <br>
+                                                        <span>russelcuevas0@gmail.com</span>
                                                     </td>
                                                     <td>
                                                         <span style="font-size: 10px;">November 23 2024 / 7:00am</span>
                                                     </td>
                                                     <td>
-                                                        Pending
+                                                        <span style="color: green;">Completed</span>
                                                     </td>
                                                 </tr>
                                             </tbody>

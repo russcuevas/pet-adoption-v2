@@ -92,11 +92,9 @@
         </li> -->
 
 
+
         <li class="nav-item topbar-user dropdown hidden-caret">
           <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
-            <div class="avatar-sm">
-              <img src="assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle" />
-            </div>
             <span class="profile-username">
               <span style="color: white !important;" class="op-7">Hi,</span>
               <span style="color: white !important;" class="fw-bold">Russel</span>
@@ -106,9 +104,6 @@
             <div class="dropdown-user-scroll scrollbar-outer">
               <li>
                 <div class="user-box">
-                  <div class="avatar-lg">
-                    <img src="assets/img/profile.jpg" alt="image profile" class="avatar-img rounded" />
-                  </div>
                   <div class="u-text">
                     <h4>Russel</h4>
                     <p class="text-muted">hello@example.com</p>
@@ -117,7 +112,7 @@
               </li>
               <li>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Account Setting</a>
+                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Change profile</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Logout</a>
               </li>
@@ -128,4 +123,40 @@
     </div>
   </nav>
   <!-- End Navbar -->
+</div>
+
+
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">Change Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="fullname" class="form-label">Fullname</label>
+            <input style="border: 2px solid grey" type="fullname" class="form-control" id="fullname" placeholder="" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input style="border: 2px solid grey" type="email" class="form-control" id="email" placeholder="" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input style="border: 2px solid grey" type="password" class="form-control" id="password" placeholder="" required>
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input style="border: 2px solid grey" type="password" class="form-control" id="confirmPassword" placeholder="" required>
+          </div>
+          <div class="modal-footer border-0">
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
