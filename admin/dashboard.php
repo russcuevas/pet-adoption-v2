@@ -10,6 +10,14 @@ if (!isset($admin_id)) {
   header('location:admin_login.php');
 }
 
+// GET THE USERS
+$get_total_users = "SELECT COUNT(*) AS total_users FROM `tbl_users`";
+$stmt_total_users = $conn->prepare($get_total_users);
+$stmt_total_users->execute();
+$result_total_users = $stmt_total_users->fetch(PDO::FETCH_ASSOC);
+$total_users = $result_total_users['total_users'];
+// END GET TOTAL USERS
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +73,7 @@ if (!isset($admin_id)) {
                     <div class="col col-stats ms-3 ms-sm-0">
                       <div class="numbers">
                         <p class="card-category">Total Users</p>
-                        <h4 class="card-title">3</h4>
+                        <h4 class="card-title"><?php echo $total_users ?></h4>
                       </div>
                     </div>
                   </div>

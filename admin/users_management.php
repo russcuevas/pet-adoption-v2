@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
   $stmt_insert_user = $conn->prepare("INSERT INTO tbl_users (fullname, contact, email, address, password) VALUES (?, ?, ?, ?, ?)");
   $stmt_insert_user->execute([$fullname, $contact, $email, $address, $hashed_password]);
 
-  $_SESSION['insert_user_success'] = "User added successfully";
+  $_SESSION['insert_user_success'] = "New user added successfully";
   header('location: users_management.php');
   exit;
 }
@@ -295,7 +295,7 @@ if (isset($_POST['delete'])) {
                                 <a href="" data-bs-toggle="modal" data-bs-target="#edit_<?php echo $user['user_id']; ?>" class="btn btn-link btn-primary btn-lg">
                                   <i class="fa fa-edit"></i>
                                 </a>
-                                <a href="" style="margin-top: 5px;" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $user['user_id']; ?>" class="btn btn-link btn-danger">
+                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $user['user_id']; ?>" class="btn btn-link btn-danger btn-lg">
                                   <i class="fa fa-times"></i>
                                 </a>
                               </div>
@@ -304,7 +304,7 @@ if (isset($_POST['delete'])) {
                               <div class="modal fade" id="edit_<?php echo $user['user_id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                   <div class="modal-content">
-                                    <form action="users_management.php" method="POST">
+                                    <form action="" method="POST">
                                       <div class="modal-header border-0">
                                         <h5 class="modal-title">
                                           <span class="fw-mediumbold">Edit User</span>
@@ -346,13 +346,13 @@ if (isset($_POST['delete'])) {
                                           <div class="col-md-6 pe-0">
                                             <div class="form-group">
                                               <label>New Password</label>
-                                              <input style="border: 2px solid grey;" type="password" class="form-control" name="password" placeholder="Enter new password (optional)" />
+                                              <input style="border: 2px solid grey;" type="password" class="form-control" name="password" placeholder="(optional)" />
                                             </div>
                                           </div>
                                           <div class="col-md-6">
                                             <div class="form-group">
                                               <label>Confirm New Password</label>
-                                              <input style="border: 2px solid grey;" type="password" name="confirm_password" class="form-control" placeholder="Confirm new password (optional)" />
+                                              <input style="border: 2px solid grey;" type="password" name="confirm_password" class="form-control" placeholder="(optional)" />
                                               <?php if (isset($_SESSION['update_user_errors']['password'])) : ?>
                                                 <div class="col-12">
                                                   <span class="text-danger">* <?php echo $_SESSION['update_user_errors']['password']; ?></span>

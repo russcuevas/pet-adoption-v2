@@ -1,3 +1,137 @@
+<?php
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+  header('location:admin_login.php');
+}
+
+// CREATE ADMIN
+if (isset($_POST['submit'])) {
+  $fullname = $_POST['fullname'];
+  $contact = $_POST['contact'];
+  $email = $_POST['email'];
+  $address = $_POST['address'];
+  $password = $_POST['password'];
+  $confirm_password = $_POST['confirm_password'];
+
+  $errors = [];
+
+  if ($password !== $confirm_password) {
+    $errors['password'] = "Password mismatch";
+  }
+
+  $stmt_check_email = $conn->prepare("SELECT COUNT(*) FROM tbl_admin WHERE email = ?");
+  $stmt_check_email->execute([$email]);
+  $count = $stmt_check_email->fetchColumn();
+
+  if ($count > 0) {
+    $errors['email'] = "Email already exists";
+  }
+
+  if (!empty($errors)) {
+    $_SESSION['insert_admin_errors'] = $errors;
+    header('location: admin_management.php');
+    exit;
+  }
+
+  unset($_SESSION['insert_admin_errors']);
+
+  $hashed_password = sha1($password);
+  $stmt_insert_admin = $conn->prepare("INSERT INTO tbl_admin (fullname, contact, email, address, password) VALUES (?, ?, ?, ?, ?)");
+  $stmt_insert_admin->execute([$fullname, $contact, $email, $address, $hashed_password]);
+
+  $_SESSION['insert_admin_success'] = "New admin added successfully";
+  header('location: admin_management.php');
+  exit;
+}
+// END CREATE ADMIN
+
+// READ ADMIN
+$get_admin = "SELECT * FROM `tbl_admin`";
+$get_stmt = $conn->query($get_admin);
+$admins = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+// END READ ADMIN
+
+// UPDATE ADMIN
+if (isset($_POST['update'])) {
+  $admin_id = $_POST['admin_id'];
+  $fullname = $_POST['fullname'];
+  $contact = $_POST['contact'];
+  $email = $_POST['email'];
+  $address = $_POST['address'];
+  $password = $_POST['password'];
+  $confirm_password = $_POST['confirm_password'];
+
+  $errors = [];
+
+  if (!empty($password)) {
+    if ($password !== $confirm_password) {
+      $errors['password'] = "Password mismatch";
+      $_SESSION['show_edit_modal'] = true;
+    }
+    $hashed_password = sha1($password);
+  } else {
+    $stmt_existing_password = $conn->prepare("SELECT password FROM tbl_admin WHERE admin_id = ?");
+    $stmt_existing_password->execute([$admin_id]);
+    $existing_password = $stmt_existing_password->fetchColumn();
+    $hashed_password = $existing_password;
+  }
+
+  if ($email != $admin['email']) {
+    $stmt_check_email = $conn->prepare("SELECT COUNT(*) FROM tbl_admin WHERE email = ? AND admin_id != ?");
+    $stmt_check_email->execute([$email, $admin_id]);
+    $count = $stmt_check_email->fetchColumn();
+    if ($count > 0) {
+      $errors['email'] = "Email already exists for another admin";
+      $_SESSION['show_edit_modal'] = true;
+    }
+  }
+
+  if (!empty($errors)) {
+    $_SESSION['update_admin_errors'] = $errors;
+    header("location: admin_management.php");
+    exit;
+  }
+
+  unset($_SESSION['update_admin_errors']);
+
+  $stmt_update_admin = $conn->prepare("UPDATE tbl_admin SET fullname = ?, contact = ?, email = ?, address = ?, password = ? WHERE admin_id = ?");
+  $stmt_update_admin->execute([$fullname, $contact, $email, $address, $hashed_password, $admin_id]);
+
+  if ($stmt_update_admin) {
+    $_SESSION['update_admin_success'] = "Admin updated successfully";
+  } else {
+    $_SESSION['update_admin_errors'] = "Error updating admin";
+  }
+
+  header('location: admin_management.php');
+  exit;
+}
+// END UPDATE ADMIN
+
+
+// DELETE ADMIN
+if (isset($_POST['delete'])) {
+  $admin_id = $_POST['admin_id'];
+
+  $delete_query = $conn->prepare("DELETE FROM tbl_admin WHERE admin_id = ?");
+  $delete_query->execute([$admin_id]);
+
+  if ($delete_query) {
+    $_SESSION['delete_success'] = "Admin deleted successfully";
+  } else {
+    $_SESSION['delete_error'] = "Error deleting admin";
+  }
+  header('location: admin_management.php');
+  exit;
+}
+// END DELETE ADMIN
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,37 +217,53 @@
                               <div class="col-md-6 pe-0">
                                 <div class="form-group">
                                   <label>Fullname</label>
-                                  <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                  <input style="border: 2px solid grey;" name="fullname" type="text" class="form-control" placeholder="" required />
                                 </div>
                               </div>
                               <div class="col-md-6">
                                 <div class="form-group">
                                   <label>Phone Number</label>
-                                  <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                  <input style="border: 2px solid grey;" name="contact" type="text" class="form-control" placeholder="" required />
                                 </div>
                               </div>
                               <div class="col-sm-12">
                                 <div class="form-group">
                                   <label>Email</label>
-                                  <input style="border: 2px solid grey;" id="addName" type="text" class="form-control" placeholder="" required />
+                                  <input style="border: 2px solid grey;" name="email" type="text" class="form-control" placeholder="" required />
+                                  <?php if (isset($_SESSION['insert_admin_errors']['email'])) : ?>
+                                    <div class="col-12">
+                                      <span class="text-danger">* <?php echo $_SESSION['insert_admin_errors']['email']; ?></span>
+                                    </div>
+                                  <?php endif; ?>
+                                </div>
+                              </div>
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <label>Address</label>
+                                  <input style="border: 2px solid grey;" name="address" type="text" class="form-control" placeholder="" required />
                                 </div>
                               </div>
                               <div class="col-md-6 pe-0">
                                 <div class="form-group">
                                   <label>Password</label>
-                                  <input style="border: 2px solid grey;" type="password" class="form-control" placeholder="" required />
+                                  <input style="border: 2px solid grey;" name="password" type="password" class="form-control" placeholder="" required />
                                 </div>
                               </div>
                               <div class="col-md-6">
                                 <div class="form-group">
                                   <label>Confirm Password</label>
-                                  <input style="border: 2px solid grey;" type="password" class="form-control" placeholder="" required />
+                                  <input style="border: 2px solid grey;" name="confirm_password" type="password" class="form-control" placeholder="" required />
+                                  <?php if (isset($_SESSION['insert_admin_errors']['password'])) : ?>
+                                    <div class="col-12">
+                                      <span class="text-danger">* <?php echo $_SESSION['insert_admin_errors']['password']; ?></span>
+                                    </div>
+                                  <?php endif; ?>
                                 </div>
                               </div>
                             </div>
                           </div>
                           <div class="modal-footer border-0">
-                            <input type="submit" class="btn btn-primary" value="Add">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Add">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                           </div>
                         </form>
@@ -135,73 +285,124 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Tiger Nixon</td>
-                          <td>Tiger Nixon</td>
-                          <td>System Architect</td>
-                          <td>Edinburgh</td>
-                          <td>
-                            <div class="form-button-action">
-                              <a href="" class="btn btn-link btn-primary btn-lg">
-                                <i class="fa fa-edit"></i>
-                              </a>
-                              <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                <i class="fa fa-times"></i>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Garrett Winters</td>
-                          <td>Tiger Nixon</td>
+                        <?php foreach ($admins as $admin) : ?>
+                          <?php if ($admin['admin_id'] != $admin_id) : ?>
 
-                          <td>Accountant</td>
-                          <td>Tokyo</td>
-                          <td>
-                            <div class="form-button-action">
-                              <a href="" class="btn btn-link btn-primary btn-lg">
-                                <i class="fa fa-edit"></i>
-                              </a>
-                              <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                <i class="fa fa-times"></i>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Ashton Cox</td>
-                          <td>Tiger Nixon</td>
+                            <tr>
+                              <td><?php echo $admin['fullname'] ?></td>
+                              <td><?php echo $admin['email'] ?></td>
+                              <td><?php echo $admin['address'] ?></td>
+                              <td><?php echo $admin['contact'] ?></td>
+                              <td>
+                                <div class="form-button-action">
+                                  <a href="" data-bs-toggle="modal" data-bs-target="#edit_<?php echo $admin['admin_id']; ?>" class="btn btn-link btn-primary btn-lg">
+                                    <i class="fa fa-edit"></i>
+                                  </a>
+                                  <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $admin['admin_id']; ?>" class="btn btn-link btn-danger btn-lg">
+                                    <i class="fa fa-times"></i>
+                                  </a>
+                                </div>
 
-                          <td>Junior Technical Author</td>
-                          <td>San Francisco</td>
-                          <td>
-                            <div class="form-button-action">
-                              <a href="" class="btn btn-link btn-primary btn-lg">
-                                <i class="fa fa-edit"></i>
-                              </a>
-                              <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                <i class="fa fa-times"></i>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Cedric Kelly</td>
-                          <td>Tiger Nixon</td>
 
-                          <td>Senior Javascript Developer</td>
-                          <td>Edinburgh</td>
-                          <td>
-                            <div class="form-button-action">
-                              <a href="" class="btn btn-link btn-primary btn-lg">
-                                <i class="fa fa-edit"></i>
-                              </a>
-                              <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                <i class="fa fa-times"></i>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
+                                <!-- EDIT MODAL -->
+                                <div class="modal fade" id="edit_<?php echo $admin['admin_id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <form action="" method="POST">
+                                        <div class="modal-header border-0">
+                                          <h5 class="modal-title">
+                                            <span class="fw-mediumbold">Edit User</span>
+                                          </h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <div class="row">
+                                            <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
+                                            <div class="col-md-6 pe-0">
+                                              <div class="form-group">
+                                                <label>Fullname</label>
+                                                <input style="border: 2px solid grey;" type="text" class="form-control" name="fullname" value="<?php echo htmlspecialchars($admin['fullname']); ?>" placeholder="Enter fullname" required />
+                                              </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                              <div class="form-group">
+                                                <label>Phone Number</label>
+                                                <input style="border: 2px solid grey;" type="text" class="form-control" name="contact" value="<?php echo htmlspecialchars($admin['contact']); ?>" placeholder="Enter phone number" required />
+                                              </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                              <div class="form-group">
+                                                <label>Email</label>
+                                                <input style="border: 2px solid grey;" type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" placeholder="Enter email" required />
+                                                <?php if (isset($_SESSION['update_admin_errors']['email'])) : ?>
+                                                  <div class="col-12">
+                                                    <span class="text-danger">* <?php echo $_SESSION['update_admin_errors']['email']; ?></span>
+                                                  </div>
+                                                <?php endif; ?>
+                                              </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                              <div class="form-group">
+                                                <label>Address</label>
+                                                <input style="border: 2px solid grey;" type="text" class="form-control" name="address" value="<?php echo htmlspecialchars($admin['address']); ?>" placeholder="Enter address" required />
+                                              </div>
+                                            </div>
+                                            <div class="col-md-6 pe-0">
+                                              <div class="form-group">
+                                                <label>New Password</label>
+                                                <input style="border: 2px solid grey;" type="password" class="form-control" name="password" placeholder="(optional)" />
+                                              </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                              <div class="form-group">
+                                                <label>Confirm New Password</label>
+                                                <input style="border: 2px solid grey;" type="password" name="confirm_password" class="form-control" placeholder="(optional)" />
+                                                <?php if (isset($_SESSION['update_admin_errors']['password'])) : ?>
+                                                  <div class="col-12">
+                                                    <span class="text-danger">* <?php echo $_SESSION['update_admin_errors']['password']; ?></span>
+                                                  </div>
+                                                <?php endif; ?>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                          <input type="submit" name="update" class="btn btn-primary" value="Save changes">
+                                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- END EDIT MODAL -->
+
+                                <!-- DELETE MODAL -->
+                                <div class="modal fade" id="delete_<?php echo $admin['admin_id'] ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <form action="" method="POST">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title">Delete Admin</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id'] ?>">
+                                          <p>Are you sure you want to delete the admin "<?php echo $admin['fullname']; ?>"?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" class="btn btn-danger" name="delete">Delete</button>
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- END DELETE MODAL -->
+
+                              </td>
+                            </tr>
+                          <?php endif ?>
+                        <?php endforeach ?>
                       </tbody>
                     </table>
                   </div>
@@ -230,6 +431,92 @@
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- CREATE-->
+    <?php if (isset($_SESSION['insert_admin_success'])) : ?>
+      <script>
+        $(document).ready(function() {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '<?php echo $_SESSION['insert_admin_success']; ?>',
+            confirmButtonText: 'OK'
+          });
+        });
+      </script>
+      <?php unset($_SESSION['insert_admin_success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['insert_admin_errors'])) : ?>
+      <script>
+        $(document).ready(function() {
+          $('#addRowModal').modal('show');
+        });
+      </script>
+      <?php unset($_SESSION['insert_admin_errors']); ?>
+    <?php endif; ?>
+
+    <!-- END CREATE -->
+
+    <!-- UPDATE-->
+    <?php if (isset($_SESSION['update_admin_success'])) : ?>
+      <script>
+        $(document).ready(function() {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '<?php echo $_SESSION['update_admin_success']; ?>',
+            confirmButtonText: 'OK'
+          });
+        });
+      </script>
+      <?php unset($_SESSION['update_admin_success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['update_admin_errors'])) : ?>
+      <script>
+        $(document).ready(function() {
+          <?php if (isset($_SESSION['show_edit_modal']) && $_SESSION['show_edit_modal']) : ?>
+            $('#edit_<?php echo $admin['admin_id']; ?>').modal('show');
+          <?php endif; ?>
+
+          <?php unset($_SESSION['show_edit_modal']); ?>;
+        });
+      </script>
+      <?php unset($_SESSION['update_admin_errors']); ?>
+    <?php endif; ?>
+
+    <!-- END UPDATE -->
+
+
+
+    <!-- DELETE -->
+    <?php if (isset($_SESSION['delete_success'])) : ?>
+      <script>
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: '<?php echo $_SESSION['delete_success']; ?>',
+          confirmButtonText: 'OK'
+        })
+      </script>
+      <?php unset($_SESSION['delete_success']); ?>;
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['delete_error'])) : ?>
+      <script>
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: '<?php echo $_SESSION['delete_error']; ?>',
+          confirmButtonText: 'OK'
+        })
+      </script>
+      <?php unset($_SESSION['delete_error']); ?>;
+    <?php endif; ?>
+    <!-- END DELETE -->
+
     <script>
       WebFont.load({
         google: {
