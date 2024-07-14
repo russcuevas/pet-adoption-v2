@@ -1,3 +1,13 @@
+<?php
+include 'database/connection.php';
+if (isset($_GET['event_id'])) {
+    $event_id = $_GET['event_id'];
+
+    $stmt = $conn->prepare("SELECT * FROM `tbl_news_announcement` WHERE event_id = ?");
+    $stmt->execute([$event_id]);
+    $news = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -114,7 +124,7 @@
         <div class="container">
             <div class="p-4 p-md-5 mt-5 mb-4 rounded text-body-emphasis bg-body-secondary">
                 <div class="col-lg-6 px-0">
-                    <h1 class="display-4 fst-italic">Title</h1>
+                    <h1 class="display-4 fst-italic"><?php echo $news['event_title']; ?></h1>
                 </div>
             </div>
 
@@ -122,11 +132,8 @@
                 <div class="col-md-8">
                     <article class="blog-post">
                         <h2 class="display-5 link-body-emphasis mb-1">Sample blog post</h2>
-                        <p class="blog-post-meta">January 1, 2021 by <a href="#">Mark</a></p>
-
-                        <p>This blog post shows a few different types of content that’s supported and styled with Bootstrap. Basic typography, lists, tables, images, code, and more are all supported as expected.</p>
-                        <hr>
-                        <p>This is some additional paragraph placeholder content. It has been written to fill the available space and show how a longer snippet of text affects the surrounding content. We'll repeat it often to keep the demonstration flowing, so be on the lookout for this exact same string of text.</p>
+                        <p class="blog-post-meta"><?php echo date_format(new DateTime($news['event_schedule']), 'F j Y / h:i A'); ?> by <a href="#">Admin</a></p>
+                        <p><?php echo $news['event_description'] ?></p>
                     </article>
                 </div>
             </div>
@@ -136,15 +143,6 @@
     </div>
 
 
-
-
-    <!-- FOOTER -->
-    <footer id="footer" style="background-color: #704130 !important;" class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2024 Russel Vincent Cuevas, John Dave De Leon, Archie De Vera</p>
-            <p>Contact us at info@petkosystem</p>
-        </div>
-    </footer>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
