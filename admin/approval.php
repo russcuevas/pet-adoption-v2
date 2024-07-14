@@ -62,18 +62,25 @@
                                         <table id="add-row" class="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
+                                                    <th>Owner</th>
                                                     <th>Image</th>
-                                                    <th>Pet Name</th>
-                                                    <th>Pet Type</th>
-                                                    <th>Pet Breed</th>
-                                                    <th>Pet Description</th>
-                                                    <th>Pet Age</th>
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Breed</th>
+                                                    <th>Description</th>
+                                                    <th>Age</th>
                                                     <th style="width: 10%">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
 
                                                 <tr>
+                                                    <td>
+                                                        <span> Russel Vincent Cuevas</span> <br>
+                                                        <span> Calingatan Mataasnakahoy Batangas</span> <br>
+                                                        <span> 09495748302</span> <br>
+                                                        <span> russelcuevas0@gmail.com</span>
+                                                    </td>
                                                     <td><img style="height: 75px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt=""></td>
                                                     <td>Tiger</td>
                                                     <td>Dog</td>

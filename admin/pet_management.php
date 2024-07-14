@@ -51,89 +51,9 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <div class="d-flex align-items-center">
-                                        <h4 class="card-title"></h4>
-                                        <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addRowModal">
-                                            <i class="fa fa-plus"></i>
-                                            Add Pets
-                                        </button>
-                                    </div>
+
                                 </div>
                                 <div class="card-body">
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <form method="POST">
-                                                    <div class="modal-header border-0">
-                                                        <h5 class="modal-title">
-                                                            <span class="fw-mediumbold"> Add Pets</span>
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <input type="text" name="admin_id">
-                                                            <div class="col-md-12">
-                                                                <div class="form-group">
-                                                                    <label>Pet Image</label><br>
-                                                                    <input type="file"><br><br>
-                                                                    <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Name</label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you dont know*)</span></label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Type</label>
-                                                                    <select style="border: 2px solid grey;" class="form-select" id="exampleFormControlSelect1">
-                                                                        <option>Dog</option>
-                                                                        <option>Cat</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Pet Breed</label>
-                                                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div class="form-group">
-                                                                    <label for="petCondition">Pet Condition</label>
-                                                                    <select style="border: 2px solid grey;" class="form-select" id="petCondition" onchange="toggleInput()">
-                                                                        <option value="healthy">Healthy</option>
-                                                                        <option value="sick">In sick</option>
-                                                                    </select>
-                                                                    <div id="specificSickInput" style="display: none;">
-                                                                        <label for="specificSick">Specific sickness:</label>
-                                                                        <input style="border: 2px solid grey" type="text" class="form-control" id="specificSick" name="specificSick">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0">
-                                                        <input type="submit" class="btn btn-primary" value="Add">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-
                                     <div class="table-responsive">
                                         <table id="add-row" class="display table table-striped table-hover">
                                             <thead>

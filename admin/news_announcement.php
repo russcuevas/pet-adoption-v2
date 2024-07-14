@@ -300,7 +300,7 @@ if (isset($_POST['delete'])) {
                                                                 <a href="" data-bs-toggle="modal" data-bs-target="#edit_<?php echo $announcement['event_id']; ?>" class="btn btn-link btn-primary btn-lg">
                                                                     <i class="fa fa-edit"></i>
                                                                 </a>
-                                                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $announcement['event_id']; ?>" class="btn btn-link btn-primary btn-lg">
+                                                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $announcement['event_id']; ?>" class="btn btn-link btn-danger btn-lg">
                                                                     <i class="fa fa-times"></i>
                                                                 </a>
                                                             </div>
