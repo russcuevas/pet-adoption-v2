@@ -131,7 +131,9 @@ if (isset($_GET['event_id'])) {
             <div class="row g-5">
                 <div class="col-md-8">
                     <article class="blog-post">
-                        <h2 class="display-5 link-body-emphasis mb-1">Sample blog post</h2>
+                        <h2 class="display-5 link-body-emphasis mb-1">
+                            <img style="height: 200px; width: 200px" src="assets/event_image/<?php echo $news['event_image'] ?>" alt="">
+                        </h2>
                         <p class="blog-post-meta"><?php echo date_format(new DateTime($news['event_schedule']), 'F j Y / h:i A'); ?> by <a href="#">Admin</a></p>
                         <p><?php echo $news['event_description'] ?></p>
                     </article>

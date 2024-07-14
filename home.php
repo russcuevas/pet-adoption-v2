@@ -1,3 +1,12 @@
+<?php
+include 'database/connection.php';
+
+// DISPLAY NEWS AND ANNOUNCEMENT
+$get_news = "SELECT * FROM `tbl_news_announcement` LIMIT 4";
+$get_stmt = $conn->query($get_news);
+$announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+// END DISPLAY
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -171,78 +180,26 @@
 
         <h2 class="pb-2 mb-5">News & Announcement</h2>
         <div class="row mb-2">
-            <div class="col-md-6">
-                <div class="card mb-4 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                <h3 class="card-title">Title</h3>
-                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
-                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
-                                <a href="#" class="stretched-link">Continue reading</a>
+            <?php foreach ($announcements as $announcement) : ?>
+                <div class="col-md-6">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="row g-0">
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                    <h3 class="card-title"><?php echo $announcement['event_title'] ?></h3>
+                                    <p class="card-text mb-1"><small class="text-muted"><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></small></p>
+                                    <p class="card-text"><?php echo substr($announcement['event_description'], 0, 10) . '...' ?></p>
+                                    <a href="single_news.php?event_id=<?php echo $announcement['event_id']; ?>" class="stretched-link">Continue reading</a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
+                            <div class="col-md-4">
+                                <img style="height: auto; width: auto" src="assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Image" class="img-fluid rounded-start">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-4 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                <h3 class="card-title">Title</h3>
-                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
-                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
-                                <a href="#" class="stretched-link">Continue reading</a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-4 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                <h3 class="card-title">Title</h3>
-                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
-                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
-                                <a href="#" class="stretched-link">Continue reading</a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-4 shadow-sm">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                <h3 class="card-title">Title</h3>
-                                <p class="card-text mb-1"><small class="text-muted">Nov 11</small></p>
-                                <p class="card-text">This is a sample description. It can be a bit longer to demonstrate how the card layout handles more text.</p>
-                                <a href="#" class="stretched-link">Continue reading</a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <img style="height: auto; width: auto" src="https://th.bing.com/th/id/OIP.j746v7OdUjPc9M9IUq00mwHaE8?rs=1&pid=ImgDetMain" alt="Image" class="img-fluid rounded-start">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach ?>
 
         </div>
         <a style="display: flex; align-items: center; justify-content: center;" href="news_announcement.php">View all</a>
