@@ -60,3 +60,6 @@ event_description
 created_at
 updated_at
 
+tbl_reports
+
+

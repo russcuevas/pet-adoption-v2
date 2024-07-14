@@ -70,7 +70,7 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div id="loginForm">
-                        <form method="POST">
+                        <form action="" method="POST">
                             <h5>Login</h5><br>
                             <div class="form-group">
                                 <label for="email">Email address</label>
@@ -88,27 +88,35 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                         </form>
                     </div>
                     <div id="registerForm" style="display: none;">
-                        <form method="POST">
+                        <form action="auth/register.php" method="POST">
                             <h5>Register</h5><br>
                             <div class="form-group">
+                                <label for="registerFullname">Fullname</label>
+                                <input type="text" name="fullname" class="form-control" id="registerFullname" placeholder="Enter fullname" required>
+                            </div>
+                            <div class="form-group">
                                 <label for="registerEmail">Email address</label>
-                                <input type="email" class="form-control" id="registerEmail" placeholder="Enter email" required>
+                                <input type="email" name="email" class="form-control" id="registerEmail" placeholder="Enter email" required>
                             </div>
                             <div class="form-group">
                                 <label for="registerPassword">Password</label>
-                                <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
+                                <input type="password" name="password" class="form-control" id="registerPassword" placeholder="Password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPassword">Confirm Password</label>
+                                <input type="password" name="confirm_password" class="form-control" id="registerPassword" placeholder="Password" required>
                             </div>
                             <div class="form-group">
                                 <label for="address">Address</label>
-                                <input type="text" class="form-control" id="address" placeholder="Enter address" required>
+                                <input type="text" name="address" class="form-control" id="address" placeholder="Enter address" required>
                             </div>
                             <div class="form-group">
                                 <label for="phone">Phone Number</label>
-                                <input type="text" class="form-control" id="phone" placeholder="Enter phone number" required>
+                                <input type="text" name="contact" class="form-control" id="phone" placeholder="Enter phone number" required>
                             </div>
                             <br>
                             <div style="display: flex; justify-content: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Register</button>
+                                <button type="submit" name="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Register</button>
                             </div>
                         </form>
                         <p class="mt-2">Already have an account? Click here to <a href="#" id="showLogin">Login</a></p>
@@ -312,6 +320,7 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js"></script>
+
 </body>
 
 </html>
