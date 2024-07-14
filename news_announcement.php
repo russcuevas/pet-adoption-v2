@@ -1,11 +1,21 @@
 <?php
 include 'database/connection.php';
 
-// DISPLAY NEWS AND ANNOUNCEMENT
-$get_news = "SELECT * FROM `tbl_news_announcement` LIMIT 6";
-$get_stmt = $conn->query($get_news);
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$items_per_page = 6;
+$offset = ($page - 1) * $items_per_page;
+
+$total_query = $conn->query("SELECT COUNT(*) FROM `tbl_news_announcement`");
+$total_items = $total_query->fetchColumn();
+$total_pages = ceil($total_items / $items_per_page);
+
+$get_news = "SELECT * FROM `tbl_news_announcement` LIMIT :offset, :items_per_page";
+$get_stmt = $conn->prepare($get_news);
+$get_stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$get_stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
+$get_stmt->execute();
 $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
-// END DISPLAYING
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -154,17 +164,37 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <!-- PAGINATION -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                        </li>
-                        <li class="page-item active" aria-current="page">
-                            <a class="page-link" href="#">1 <span class="visually-hidden">(current)</span></a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
+                        <?php if ($page > 1) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="news_announcement.php?page=<?php echo $page - 1; ?>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        <?php else : ?>
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
+                                <a class="page-link" href="news_announcement.php?page=<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $total_pages) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="news_announcement.php?page=<?php echo $page + 1; ?>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        <?php else : ?>
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
 
