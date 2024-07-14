@@ -11,11 +11,7 @@ if (!isset($admin_id)) {
 
 // ADD NEWS & ANNOUNCEMENT QUERY
 if (isset($_POST['submit'])) {
-
-    $title = $_POST['event_title'];
-    $date = $_POST['event_schedule'];
-    $description = $_POST['event_description'];
-
+    $upload_error = [];
     $uploadDir = '../assets/event_image/';
     $uploadFile = $uploadDir . basename($_FILES['event_image']['name']);
     $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
@@ -23,48 +19,38 @@ if (isset($_POST['submit'])) {
     if ($_FILES['event_image']['size'] > 0) {
         $check = getimagesize($_FILES['event_image']['tmp_name']);
         if ($check === false) {
-            $_SESSION['upload_error'] = "File is not an image.";
-            header('location: news_announcement.php');
-            exit;
-        }
-        if ($_FILES['event_image']['size'] > 5000000) {
-            $_SESSION['upload_error'] = "Sorry, your file is too large.";
-            header('location: news_announcement.php');
-            exit;
-        }
-        $allowedTypes = array('jpg', 'jpeg', 'png', 'gif');
-        if (!in_array($imageFileType, $allowedTypes)) {
-            $_SESSION['upload_error'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-            header('location: news_announcement.php');
-            exit;
+            $upload_error['image'] = "File is not an image.";
+        } elseif ($_FILES['event_image']['size'] > 5000000) {
+            $upload_error['image'] = "Sorry, your file is too large.";
+        } elseif (!in_array($imageFileType, array('jpg', 'jpeg', 'png', 'gif'))) {
+            $upload_error['image'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         }
 
-        $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
-        $uploadFile = $uploadDir . $uniqueFileName;
+        if (empty($upload_error['image'])) {
+            $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
+            $uploadFile = $uploadDir . $uniqueFileName;
 
-        if (!move_uploaded_file($_FILES['event_image']['tmp_name'], $uploadFile)) {
-            $_SESSION['upload_error'] = "Sorry, there was an error uploading your file.";
-            header('location: news_announcement.php');
-            exit;
+            if (!move_uploaded_file($_FILES['event_image']['tmp_name'], $uploadFile)) {
+                $upload_error['image'] = "Sorry, there was an error uploading your file.";
+            }
         }
     } else {
-        $_SESSION['upload_error'] = "Please select an image file.";
-        header('location: news_announcement.php');
-        exit;
+        $upload_error['image'] = "Please select an image file.";
     }
 
-    $insert_query = $conn->prepare("INSERT INTO tbl_news_announcement (event_image, event_title, event_schedule, event_description) VALUES (?, ?, ?, ?)");
-    $insert_query->execute([$uniqueFileName, $title, $date, $description]);
+    if (empty($upload_error['image'])) {
+        $insert_query = $conn->prepare("INSERT INTO tbl_news_announcement (event_image, event_title, event_schedule, event_description) VALUES (?, ?, ?, ?)");
+        $insert_query->execute([$uniqueFileName, $_POST['event_title'], $_POST['event_schedule'], $_POST['event_description']]);
 
-    if ($insert_query) {
-        $_SESSION['upload_success'] = "News & Announcement added successfully.";
-        header('location: news_announcement.php');
-        exit;
-    } else {
-        $_SESSION['upload_error'] = "Error inserting data into database.";
-        header('location: news_announcement.php');
-        exit;
+        if ($insert_query) {
+            $_SESSION['upload_success'] = "News & Announcement added successfully.";
+            header('location: news_announcement.php');
+            exit;
+        } else {
+            $upload_error['database'] = "Error inserting data into database.";
+        }
     }
+    $_SESSION['upload_error'] = $upload_error;
 }
 // END CREATE NEWS & ANNOUNCEMENT
 
@@ -81,22 +67,24 @@ if (isset($_POST['update'])) {
     $date = $_POST['event_schedule'];
     $description = $_POST['event_description'];
 
-    if (
-        $_FILES['event_image']['size'] > 0
-    ) {
+    // Check if a new image file is uploaded
+    if ($_FILES['event_image']['size'] > 0) {
         $uploadDir = '../assets/event_image/';
         $uploadFile = $uploadDir . basename($_FILES['event_image']['name']);
         $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
 
+        // Validate uploaded image
         $check = getimagesize($_FILES['event_image']['tmp_name']);
         if ($check === false) {
-            $_SESSION['upload_error'] = "File is not an image.";
+            $_SESSION['update_upload_error'] = "File is not an image.";
+            $_SESSION['show_edit_modal'] = true;
             header('location: news_announcement.php');
             exit;
         }
 
         if ($_FILES['event_image']['size'] > 5000000) {
-            $_SESSION['upload_error'] = "Sorry, your file is too large.";
+            $_SESSION['update_upload_error'] = "Sorry, your file is too large.";
+            $_SESSION['show_edit_modal'] = true;
             header('location: news_announcement.php');
             exit;
         }
@@ -104,36 +92,40 @@ if (isset($_POST['update'])) {
         $allowedTypes = array(
             'jpg', 'jpeg', 'png', 'gif'
         );
-        if (!in_array(
-            $imageFileType,
-            $allowedTypes
-        )) {
-            $_SESSION['upload_error'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+        if (!in_array($imageFileType, $allowedTypes)) {
+            $_SESSION['update_upload_error'] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $_SESSION['show_edit_modal'] = true;
             header('location: news_announcement.php');
             exit;
         }
 
+        // Generate unique file name and move uploaded file
         $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
         $uploadFile = $uploadDir . $uniqueFileName;
 
         if (!move_uploaded_file($_FILES['event_image']['tmp_name'], $uploadFile)) {
-            $_SESSION['upload_error'] = "Sorry, there was an error uploading your file.";
+            $_SESSION['update_upload_error'] = "Sorry, there was an error uploading your file.";
+            $_SESSION['show_edit_modal'] = true;
             header('location: news_announcement.php');
             exit;
         }
+
+        // Update database with new image file name
         $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_image = ? WHERE event_id = ?");
         $update_query->execute([$uniqueFileName, $event_id]);
     }
 
+    // Update other fields in the database
     $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_title = ?, event_schedule = ?, event_description = ? WHERE event_id = ?");
     $update_query->execute([$title, $date, $description, $event_id]);
 
     if ($update_query) {
-        $_SESSION['upload_success'] = "News & Announcement updated successfully.";
+        $_SESSION['update_upload_success'] = "News & Announcement updated successfully.";
         header('location: news_announcement.php');
         exit;
     } else {
-        $_SESSION['upload_error'] = "Error updating announcement.";
+        $_SESSION['update_upload_error'] = "Error updating announcement.";
+        $_SESSION['show_edit_modal'] = true;
         header('location: news_announcement.php');
         exit;
     }
@@ -143,18 +135,30 @@ if (isset($_POST['update'])) {
 // DELETE NEWS AND ANNOUNCEMENT
 if (isset($_POST['delete'])) {
     $event_id = $_POST['event_id'];
+    $select_query = $conn->prepare("SELECT event_image FROM tbl_news_announcement WHERE event_id = ?");
+    $select_query->execute([$event_id]);
+    $announcement = $select_query->fetch(PDO::FETCH_ASSOC);
+
+    if ($announcement && !empty($announcement['event_image'])) {
+        $uploadDir = '../assets/event_image/';
+        $filePath = $uploadDir . $announcement['event_image'];
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
+
     $delete_query = $conn->prepare("DELETE FROM tbl_news_announcement WHERE event_id = ?");
     $delete_query->execute([$event_id]);
 
     if ($delete_query) {
         $_SESSION['delete_success'] = "Announcement deleted successfully.";
-        header('location: news_announcement.php');
-        exit;
     } else {
         $_SESSION['delete_error'] = "Error deleting announcement.";
-        header('location: news_announcement.php');
-        exit;
     }
+
+    header('location: news_announcement.php');
+    exit;
 }
 // END DELETE NEWS AND ANNOUNCEMENT
 ?>
@@ -225,7 +229,7 @@ if (isset($_POST['delete'])) {
                                     <div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
-                                                <form action="" method="POST" enctype="multipart/form-data">
+                                                <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
                                                     <div class="modal-header border-0">
                                                         <h5 class="modal-title">
                                                             <span class="fw-mediumbold"> Add News & Announcement</span>
@@ -239,6 +243,10 @@ if (isset($_POST['delete'])) {
                                                                     <label>Image</label><br>
                                                                     <input type="file" name="event_image" required><br><br>
                                                                     <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                                                                    <br>
+                                                                    <?php if (isset($_SESSION['upload_error']['image'])) : ?>
+                                                                        <span class="text-danger">* <?php echo $_SESSION['upload_error']['image']; ?></span>
+                                                                    <?php endif; ?>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
@@ -325,6 +333,11 @@ if (isset($_POST['delete'])) {
                                                                                         <div class="form-group">
                                                                                             <label>Update Image</label><br>
                                                                                             <input type="file" name="event_image">
+                                                                                            <br>
+                                                                                            <?php if (isset($_SESSION['update_upload_error'])) : ?>
+                                                                                                <span class="text-danger"><?php echo $_SESSION['update_upload_error']; ?></span>
+                                                                                                <?php unset($_SESSION['update_upload_error']); ?>
+                                                                                            <?php endif; ?>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-6">
@@ -356,6 +369,7 @@ if (isset($_POST['delete'])) {
                                                                 </div>
                                                             </div>
                                                             <!-- END EDIT MODAL -->
+
 
                                                             <!-- DELETE MODAL -->
                                                             <div class="modal fade" id="delete_<?php echo $announcement['event_id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
@@ -416,7 +430,7 @@ if (isset($_POST['delete'])) {
 
         <!-- SWEETALERT -->
 
-        <!-- INSERT AND UPDATE -->
+        <!-- CREATE-->
         <?php if (isset($_SESSION['upload_success'])) : ?>
             <script>
                 Swal.fire({
@@ -429,17 +443,43 @@ if (isset($_POST['delete'])) {
             <?php unset($_SESSION['upload_success']); ?>;
         <?php endif; ?>
 
-        <?php if (isset($_SESSION['upload_error'])) : ?>
+
+        <script>
+            <?php if (isset($_SESSION['upload_error']['image'])) : ?>
+                $(document).ready(function() {
+                    $('#addRowModal').modal('show');
+                });
+            <?php endif; ?>
+
+            <?php unset($_SESSION['upload_error']); ?>
+        </script>
+        <!-- END CREATE -->
+
+        <!-- UPDATE -->
+        <?php if (isset($_SESSION['update_upload_success'])) : ?>
             <script>
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '<?php echo $_SESSION['upload_error']; ?>',
+                    icon: 'success',
+                    title: 'Success',
+                    text: '<?php echo $_SESSION['update_upload_success']; ?>',
                     confirmButtonText: 'OK'
                 })
             </script>
-            <?php unset($_SESSION['upload_error']); ?>;
+            <?php unset($_SESSION['update_upload_success']); ?>;
         <?php endif; ?>
+
+        <script>
+            $(document).ready(function() {
+                <?php if (isset($_SESSION['show_edit_modal']) && $_SESSION['show_edit_modal']) : ?>
+                    $('#edit_<?php echo $announcement['event_id']; ?>').modal('show');
+                <?php endif; ?>
+
+                <?php unset($_SESSION['show_edit_modal']); ?>;
+            });
+        </script>
+        <!-- END UPDATE -->
+
+
 
         <!-- DELETE -->
         <?php if (isset($_SESSION['delete_success'])) : ?>
@@ -465,6 +505,8 @@ if (isset($_POST['delete'])) {
             </script>
             <?php unset($_SESSION['delete_error']); ?>;
         <?php endif; ?>
+        <!-- END DELETE -->
+
         <!-- END SWEETALERT -->
 
         <script>
