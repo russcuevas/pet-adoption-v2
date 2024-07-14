@@ -67,13 +67,11 @@ if (isset($_POST['update'])) {
     $date = $_POST['event_schedule'];
     $description = $_POST['event_description'];
 
-    // Check if a new image file is uploaded
     if ($_FILES['event_image']['size'] > 0) {
         $uploadDir = '../assets/event_image/';
         $uploadFile = $uploadDir . basename($_FILES['event_image']['name']);
         $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
 
-        // Validate uploaded image
         $check = getimagesize($_FILES['event_image']['tmp_name']);
         if ($check === false) {
             $_SESSION['update_upload_error'] = "File is not an image.";
@@ -99,7 +97,6 @@ if (isset($_POST['update'])) {
             exit;
         }
 
-        // Generate unique file name and move uploaded file
         $uniqueFileName = uniqid('event_image_', true) . '.' . $imageFileType;
         $uploadFile = $uploadDir . $uniqueFileName;
 
@@ -110,12 +107,10 @@ if (isset($_POST['update'])) {
             exit;
         }
 
-        // Update database with new image file name
         $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_image = ? WHERE event_id = ?");
         $update_query->execute([$uniqueFileName, $event_id]);
     }
 
-    // Update other fields in the database
     $update_query = $conn->prepare("UPDATE tbl_news_announcement SET event_title = ?, event_schedule = ?, event_description = ? WHERE event_id = ?");
     $update_query->execute([$title, $date, $description, $event_id]);
 
