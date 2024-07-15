@@ -1,3 +1,19 @@
+<?php
+include 'database/connection.php';
+
+session_start();
+
+// DISPLAY FULLNAME IF LOGGED IN
+$fullname = '';
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = $user_id";
+    $stmt = $conn->query($get_user);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $fullname = $user['fullname'];
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,10 +54,32 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#footer">Contact</a>
                         </li>
-                        <li class="nav-item" style="background-color: black; border-radius: 50px;">
-                            <a href="login.php" style="text-decoration: none !important" class="nav-link">
-                                <i class="fas fa-user"></i> Login
-                            </a>
+                        <li class="nav-item dropdown" style="background-color: black; border-radius: 50px;">
+                            <?php
+                            if (isset($user_id)) { ?>
+                                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user"></i> Hi <?php echo htmlspecialchars($fullname); ?>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="my_adoption.php">My adoption</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                                </ul>
+                            <?php
+                            } else {
+                            ?>
+                                <a href="login.php" style="text-decoration: none !important" class="nav-link">
+                                    <i class="fas fa-user"></i> Login
+                                </a>
+                            <?php
+                            }
+                            ?>
                         </li>
                     </ul>
                 </div>
