@@ -39,7 +39,7 @@
                             <a class="nav-link" href="#footer">Contact</a>
                         </li>
                         <li class="nav-item" style="background-color: black; border-radius: 50px;">
-                            <a href="#" data-toggle="modal" data-target="#loginModal" style="text-decoration: none !important" class="nav-link">
+                            <a href="login.php" style="text-decoration: none !important" class="nav-link">
                                 <i class="fas fa-user"></i> Login
                             </a>
                         </li>
@@ -49,65 +49,6 @@
         </nav>
     </header>
 
-    <!-- MODAL AUTH -->
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #704130;">
-                    <h5 class="modal-title" id="loginModalLabel"></h5>
-                    <button style="background: black;" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" style="font-weight: 900; color: white;">X</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="loginForm">
-                        <form method="POST">
-                            <h5>Login</h5><br>
-                            <div class="form-group">
-                                <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password" placeholder="Password" required>
-                            </div>
-                            <br>
-                            <div style="display: flex; justify-content: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Login</button>
-                            </div>
-                            <p class="mt-2">Don't have an account? Click here to <a href="#" id="showRegister">Sign Up</a></p>
-                        </form>
-                    </div>
-                    <div id="registerForm" style="display: none;">
-                        <form method="POST">
-                            <h5>Register</h5><br>
-                            <div class="form-group">
-                                <label for="registerEmail">Email address</label>
-                                <input type="email" class="form-control" id="registerEmail" placeholder="Enter email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="registerPassword">Password</label>
-                                <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="address">Address</label>
-                                <input type="text" class="form-control" id="address" placeholder="Enter address" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="text" class="form-control" id="phone" placeholder="Enter phone number" required>
-                            </div>
-                            <br>
-                            <div style="display: flex; justify-content: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Register</button>
-                            </div>
-                        </form>
-                        <p class="mt-2">Already have an account? Click here to <a href="#" id="showLogin">Login</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- NEWS & ANNOUNCEMENT SECTION -->
     <div class="news-section">

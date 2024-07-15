@@ -1,11 +1,22 @@
 <?php
 include 'database/connection.php';
 
-// DISPLAY NEWS AND ANNOUNCEMENT
+session_start();
+
+// DISPLAY FULLNAME IF LOGGED IN
+$fullname = '';
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = $user_id";
+    $stmt = $conn->query($get_user);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $fullname = $user['fullname'];
+}
+
+// FETCH NEWS AND ANNOUNCEMENTS
 $get_news = "SELECT * FROM `tbl_news_announcement` LIMIT 4";
 $get_stmt = $conn->query($get_news);
 $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
-// END DISPLAY
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,84 +58,41 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <li class="nav-item">
                             <a class="nav-link" href="#footer">Contact</a>
                         </li>
-                        <li class="nav-item" style="background-color: black; border-radius: 50px;">
-                            <a href="#" data-toggle="modal" data-target="#loginModal" style="text-decoration: none !important" class="nav-link">
-                                <i class="fas fa-user"></i> Login
-                            </a>
+                        <li class="nav-item dropdown" style="background-color: black; border-radius: 50px;">
+                            <?php
+                            if (isset($user_id)) { ?>
+                                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user"></i> Hi <?php echo htmlspecialchars($fullname); ?>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="my_adoption.php">My adoption</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                                </ul>
+                            <?php
+                            } else {
+                            ?>
+                                <a href="login.php" style="text-decoration: none !important" class="nav-link">
+                                    <i class="fas fa-user"></i> Login
+                                </a>
+                            <?php
+                            }
+                            ?>
                         </li>
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- MODAL AUTH -->
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #704130;">
-                    <h5 class="modal-title" id="loginModalLabel"></h5>
-                    <button style="background: black;" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" style="font-weight: 900; color: white;">X</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="loginForm">
-                        <form action="" method="POST">
-                            <h5>Login</h5><br>
-                            <div class="form-group">
-                                <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password" placeholder="Password" required>
-                            </div>
-                            <br>
-                            <div style="display: flex; justify-content: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Login</button>
-                            </div>
-                            <p class="mt-2">Don't have an account? Click here to <a href="#" id="showRegister">Sign Up</a></p>
-                        </form>
-                    </div>
-                    <div id="registerForm" style="display: none;">
-                        <form action="auth/register.php" method="POST">
-                            <h5>Register</h5><br>
-                            <div class="form-group">
-                                <label for="registerFullname">Fullname</label>
-                                <input type="text" name="fullname" class="form-control" id="registerFullname" placeholder="Enter fullname" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="registerEmail">Email address</label>
-                                <input type="email" name="email" class="form-control" id="registerEmail" placeholder="Enter email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="registerPassword">Password</label>
-                                <input type="password" name="password" class="form-control" id="registerPassword" placeholder="Password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="registerPassword">Confirm Password</label>
-                                <input type="password" name="confirm_password" class="form-control" id="registerPassword" placeholder="Password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="address">Address</label>
-                                <input type="text" name="address" class="form-control" id="address" placeholder="Enter address" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="text" name="contact" class="form-control" id="phone" placeholder="Enter phone number" required>
-                            </div>
-                            <br>
-                            <div style="display: flex; justify-content: flex-end;">
-                                <button type="submit" name="submit" class="btn btn-primary" style="background-color: #704130; border: none !important;">Register</button>
-                            </div>
-                        </form>
-                        <p class="mt-2">Already have an account? Click here to <a href="#" id="showLogin">Login</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- HOME SECTION -->
     <div class="home-section">
