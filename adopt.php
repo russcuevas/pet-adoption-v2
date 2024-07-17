@@ -29,7 +29,7 @@ if (isset($_POST['request'])) {
     $pet_condition = htmlspecialchars($_POST['pet_condition']);
 
     if (
-        $pet_condition === "sick"
+        $pet_condition === "in sick"
     ) {
         $specific_sickness = isset($_POST['specific_sickness']) ? htmlspecialchars($_POST['specific_sickness']) : null;
         if (!empty($specific_sickness)) {
@@ -377,7 +377,7 @@ if (isset($_POST['request'])) {
                             </select>
                             <div id="specificSickInput" style="display: none;">
                                 <label for="specificSick">Specific sickness:</label>
-                                <input style="border: 2px solid grey;" type="text" class="form-control" id="specificSick" name="specific_sickness">
+                                <input style="border: 2px solid grey;" type="text" class="form-control" id="specificSickInput" name="specific_sickness">
                             </div>
                         </div>
                     </div>
@@ -404,7 +404,7 @@ if (isset($_POST['request'])) {
             var selectBox = document.getElementById("petCondition");
             var specificSickInput = document.getElementById("specificSickInput");
 
-            if (selectBox.value === "sick") {
+            if (selectBox.value === "in sick") {
                 specificSickInput.style.display = "block";
             } else {
                 specificSickInput.style.display = "none";

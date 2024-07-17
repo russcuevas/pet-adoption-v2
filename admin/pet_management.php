@@ -1,3 +1,25 @@
+<?php
+// INCLUDING CONNECTION TO DATABASE
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+// FETCH THE PETS
+$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+               u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+        FROM tbl_pets p
+        LEFT JOIN tbl_users u ON p.user_id = u.user_id WHERE p.pet_status = "For adoption"';
+$get_stmt = $conn->query($get_pets);
+$pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// END PETS
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -68,26 +90,26 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-
-                                                <tr>
-                                                    <td><img style="height: 75px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt=""></td>
-                                                    <td>Tiger</td>
-                                                    <td>Dog</td>
-                                                    <td>Labrador</td>
-                                                    <td>Bawal sa malamig</td>
-                                                    <td>15</td>
-                                                    <td>
-                                                        <div class="form-button-action">
-                                                            <a href="" class="btn btn-link btn-primary btn-lg">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                                                <i class="fa fa-times"></i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
+                                                <?php foreach ($pets as $pet) : ?>
+                                                    <tr>
+                                                        <td><img style="height: 75px;" src="../images/pet-images/<?php echo $pet['pet_image'] ?>" alt=""></td>
+                                                        <td><?php echo $pet['pet_name']; ?></td>
+                                                        <td><?php echo $pet['pet_type']; ?></td>
+                                                        <td><?php echo $pet['pet_breed']; ?></td>
+                                                        <td><?php echo $pet['pet_condition']; ?></td>
+                                                        <td><?php echo $pet['pet_age']; ?></td>
+                                                        <td>
+                                                            <div class="form-button-action">
+                                                                <a href="" class="btn btn-link btn-primary btn-lg">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a>
+                                                                <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
+                                                                    <i class="fa fa-times"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach ?>
                                             </tbody>
                                         </table>
                                     </div>

@@ -18,6 +18,22 @@ $result_total_users = $stmt_total_users->fetch(PDO::FETCH_ASSOC);
 $total_users = $result_total_users['total_users'];
 // END GET TOTAL USERS
 
+// GET THE TOTAL PETS REGISTERED
+$get_total_pets_register = "SELECT COUNT(*) AS total_pets FROM `tbl_pets` WHERE pet_status = 'For adoption'";
+$stmt_total_pets_register = $conn->prepare($get_total_pets_register);
+$stmt_total_pets_register->execute();
+$restult_total_pets_register = $stmt_total_pets_register->fetch(PDO::FETCH_ASSOC);
+$total_pets = $restult_total_pets_register['total_pets'];
+// END GET TOTAL PETS
+
+// GET THE TOTAL PETS APPROVAL
+$get_total_pets_approval = "SELECT COUNT(*) AS total_pets_approval FROM `tbl_pets` WHERE pet_status = 'Requesting'";
+$stmt_total_pets_approval = $conn->prepare($get_total_pets_approval);
+$stmt_total_pets_approval->execute();
+$restult_total_pets_approval = $stmt_total_pets_approval->fetch(PDO::FETCH_ASSOC);
+$total_pets_approval = $restult_total_pets_approval['total_pets_approval'];
+// END GET TOTAL PETS APPROVAL
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,7 +108,7 @@ $total_users = $result_total_users['total_users'];
                     <div class="col col-stats ms-3 ms-sm-0">
                       <div class="numbers">
                         <p class="card-category">Total Pet</p>
-                        <h4 class="card-title">1303</h4>
+                        <h4 class="card-title"><?php echo $total_pets ?></h4>
                       </div>
                     </div>
                   </div>
@@ -110,8 +126,8 @@ $total_users = $result_total_users['total_users'];
                     </div>
                     <div class="col col-stats ms-3 ms-sm-0">
                       <div class="numbers">
-                        <p class="card-category">Approval Adoption</p>
-                        <h4 class="card-title">3</h4>
+                        <p class="card-category">Approval Pets</p>
+                        <h4 class="card-title"><?php echo $total_pets_approval ?></h4>
                       </div>
                     </div>
                   </div>

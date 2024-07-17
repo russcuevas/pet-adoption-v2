@@ -67,7 +67,7 @@
         <li class="nav-item <?php if (basename($_SERVER['PHP_SELF']) == 'approval.php') echo 'active'; ?>">
           <a href="approval.php">
             <i class="fas fa-check"></i>
-            <p>Approval</p>
+            <p>Pet Approval</p>
           </a>
         </li>
 

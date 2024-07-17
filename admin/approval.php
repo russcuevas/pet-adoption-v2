@@ -1,3 +1,25 @@
+<?php
+// INCLUDING CONNECTION TO DATABASE
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+// FETCH THE APPROVAL
+$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+               u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+        FROM tbl_pets p
+        LEFT JOIN tbl_users u ON p.user_id = u.user_id WHERE p.pet_status = "Requesting"';
+$get_stmt = $conn->query($get_pets);
+$pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// END FETCH
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,32 +95,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-
-                                                <tr>
-                                                    <td>
-                                                        <span> Russel Vincent Cuevas</span> <br>
-                                                        <span> Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span> 09495748302</span> <br>
-                                                        <span> russelcuevas0@gmail.com</span>
-                                                    </td>
-                                                    <td><img style="height: 75px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt=""></td>
-                                                    <td>Tiger</td>
-                                                    <td>Dog</td>
-                                                    <td>Labrador</td>
-                                                    <td>Bawal sa malamig</td>
-                                                    <td>15</td>
-                                                    <td>
-                                                        <div class="form-button-action">
-                                                            <a href="" class="btn btn-link btn-primary btn-lg">
-                                                                <i class="fa fa-check"> Approve</i>
-                                                            </a>
-                                                            <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
-                                                                <i class="fa fa-times"> Reject</i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
+                                                <?php foreach ($pets as $pet) : ?>
+                                                    <tr>
+                                                        <td>
+                                                            <span> <?php echo $pet['owner_name']; ?></span> <br>
+                                                            <span> <?php echo $pet['owner_address']; ?></span> <br>
+                                                            <span> <?php echo $pet['owner_contact']; ?></span> <br>
+                                                            <span> <?php echo $pet['owner_email']; ?></span>
+                                                        </td>
+                                                        <td><img style="height: 75px;" src="../images/pet-images/<?php echo $pet['pet_image'] ?>" alt=""></td>
+                                                        <td><?php echo $pet['pet_name']; ?></td>
+                                                        <td><?php echo $pet['pet_type']; ?></td>
+                                                        <td><?php echo $pet['pet_breed']; ?></td>
+                                                        <td><?php echo $pet['pet_condition']; ?></td>
+                                                        <td><?php echo $pet['pet_age']; ?></td>
+                                                        <td>
+                                                            <div class="form-button-action">
+                                                                <a href="#" class="btn btn-link btn-primary btn-lg approve-pet" data-pet-id="<?php echo $pet['pet_id']; ?>">
+                                                                    <i class="fa fa-check"> Approve</i>
+                                                                </a>
+                                                                <a style="margin-top: 5px;" href="#" class="btn btn-link btn-danger reject-pet" data-pet-id="<?php echo $pet['pet_id']; ?>" data-pet-image="<?php echo $pet['pet_image']; ?>">
+                                                                    <i class="fa fa-times"> Reject</i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -127,6 +149,125 @@
 
         <!-- Fonts and icons -->
         <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <!-- APPROVE -->
+        <script>
+            $(document).on('click', '.approve-pet', function(e) {
+                e.preventDefault();
+                var petId = $(this).data('pet-id');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to approve this pet for adoption.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, approve it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'functions/approve.php',
+                            type: 'POST',
+                            data: {
+                                pet_id: petId
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    Swal.fire(
+                                        'Approved!',
+                                        'Pet has been approved for adoption.',
+                                        'success'
+                                    ).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        'Failed to approve pet: ' + response.message,
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire(
+                                    'Error!',
+                                    'Failed to approve pet: ' + error,
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+        <!-- REJECT -->
+        <script>
+            $(document).on('click', '.reject-pet', function(e) {
+                e.preventDefault();
+                var petId = $(this).data('pet-id');
+                var petImage = $(this).data('pet-image');
+
+                console.log("Pet ID:", petId);
+                console.log("Pet Image:", petImage);
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to reject this pet. This action cannot be undone.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, reject it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log("User confirmed rejection.");
+
+                        $.ajax({
+                            url: 'functions/reject.php',
+                            type: 'POST',
+                            data: {
+                                pet_id: petId,
+                                pet_image: petImage
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log("AJAX Success Response:", response);
+
+                                if (response.status === 'success') {
+                                    Swal.fire(
+                                        'Rejected!',
+                                        'Pet has been rejected.',
+                                        'success'
+                                    ).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        'Failed to reject pet: ' + response.message,
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log("AJAX Error:", xhr, status, error);
+
+                                Swal.fire(
+                                    'Error!',
+                                    'Failed to reject pet: ' + error,
+                                    'error'
+                                );
+                            }
+                        });
+                    } else {
+                        console.log("User canceled rejection.");
+                    }
+                });
+            });
+        </script>
+
         <script>
             WebFont.load({
                 google: {
