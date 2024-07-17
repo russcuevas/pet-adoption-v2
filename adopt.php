@@ -228,12 +228,12 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
                     <?php foreach ($pets as $pet) : ?>
                         <div class="col">
-                            <form id="adoptForm" action="ajax/adoption.php">
+                            <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
                                 <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
                                     <div class="badge bg-success mt-3">For Adoption</div>
                                     <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
                                         <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
-                                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
+                                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
                                         <p style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
                                         <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
                                         <p style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
@@ -255,20 +255,23 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
                                             </li>
                                         </ul>
+                                        <!-- Hidden inputs for pet_id and user_id -->
                                         <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
-                                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                        <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
                                         <?php
                                         $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
                                         $stmt_check = $conn->prepare($check_requests);
-                                        $stmt_check->execute([$user_id]);
+                                        $stmt_check->execute([$_SESSION['user_id']]);
                                         $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
                                         ?>
-                                        <button type="submit" id="confirmAdopt" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                        <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
                     <?php endforeach; ?>
+
+
                 </div>
 
                 <!-- PAGINATION -->
@@ -376,39 +379,59 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             $(document).ready(function() {
-                $('#adoptForm').on('submit', function(event) {
+                $('.adoptForm').on('submit', function(event) {
                     event.preventDefault();
 
-                    var formData = $(this).serialize();
+                    var form = $(this);
+                    var formData = form.serialize();
+                    var submitButton = form.find('[type=submit]');
+                    var petId = form.attr('id').replace('adoptForm_', '');
 
-                    $.ajax({
-                        url: 'ajax/adoption.php',
-                        type: 'POST',
-                        data: formData,
-                        dataType: 'json',
-                        success: function(response) {
-                            console.log(response);
-                            if (response.status === 'success') {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message
-                                })
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(xhr.responseText);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to submit adopt request. Please try again.',
-                                confirmButtonText: 'OK'
+                    Swal.fire({
+                        title: 'Confirm Adoption',
+                        text: 'Are you sure you want to request an adoption for this pet?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, adopt!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: 'ajax/adoption.php',
+                                type: 'POST',
+                                data: formData,
+                                dataType: 'json',
+                                success: function(response) {
+                                    console.log(response);
+                                    if (response.status === 'success') {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error(xhr.responseText);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to submit adopt request. Please try again.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                },
+                                beforeSend: function() {
+                                    submitButton.prop('disabled', true);
+                                },
+                                complete: function() {
+                                    submitButton.prop('disabled', false);
+                                }
                             });
                         }
                     });
