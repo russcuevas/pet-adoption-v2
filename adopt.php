@@ -4,16 +4,91 @@ include 'database/connection.php';
 session_start();
 
 // DISPLAY FULLNAME IF LOGGED IN
+$is_authenticated = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+
+// Get user's full name if authenticated
 $fullname = '';
-if (isset($_SESSION['user_id'])) {
+if ($is_authenticated) {
     $user_id = $_SESSION['user_id'];
-    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = $user_id";
-    $stmt = $conn->query($get_user);
+    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = ?";
+    $stmt = $conn->prepare($get_user);
+    $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    $fullname = $user['fullname'];
+    if ($user) {
+        $fullname = $user['fullname'];
+    }
 }
 
+// Requesting post
+if (isset($_POST['request'])) {
+    $user_id = $_POST['user_id'];
+    $pet_name = htmlspecialchars($_POST['pet_name']);
+    $pet_age = isset($_POST['pet_age']) ? htmlspecialchars($_POST['pet_age']) : null;
+    $pet_type = htmlspecialchars($_POST['pet_type']);
+    $pet_breed = htmlspecialchars($_POST['pet_breed']);
+    $pet_condition = htmlspecialchars($_POST['pet_condition']);
+
+    if (
+        $pet_condition === "sick"
+    ) {
+        $specific_sickness = isset($_POST['specific_sickness']) ? htmlspecialchars($_POST['specific_sickness']) : null;
+        if (!empty($specific_sickness)) {
+            $pet_condition .= " - Specific: " . $specific_sickness;
+        }
+    }
+
+    $target_dir = "images/pet-images/";
+    $file_name = basename($_FILES["pet_image"]["name"]);
+    $target_file = $target_dir . $file_name;
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+    if (!empty($_FILES["pet_image"]["tmp_name"])) {
+        $check = getimagesize($_FILES["pet_image"]["tmp_name"]);
+        if (
+            $check === false
+        ) {
+            $uploadOk = 0;
+        }
+    } else {
+        $uploadOk = 0;
+    }
+
+    if ($_FILES["pet_image"]["size"] > 500000) {
+        $uploadOk = 0;
+    }
+
+    if (
+        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif"
+    ) {
+        $uploadOk = 0;
+    }
+
+    $timestamp = time();
+    $file_name = "{$timestamp}_{$file_name}";
+    $target_file = $target_dir . $file_name;
+
+    if ($uploadOk == 1) {
+        if (move_uploaded_file($_FILES["pet_image"]["tmp_name"], $target_file)) {
+            $pet_status = "Requesting";
+
+            $relative_path = $file_name;
+            $sql = "INSERT INTO tbl_pets (user_id, pet_name, pet_age, pet_type, pet_breed, pet_condition, pet_status, pet_image, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$user_id, $pet_name, $pet_age, $pet_type, $pet_breed, $pet_condition, $pet_status, $relative_path]);
+
+            header("Location: adopt.php");
+            exit();
+        } else {
+            echo "Sorry, there was an error uploading your file.";
+        }
+    } else {
+        echo "Sorry, your file was not uploaded. Make sure it is an image file and less than 500KB.";
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -93,11 +168,19 @@ if (isset($_SESSION['user_id'])) {
         <div class="container">
             <div class="container px-4 py-5" id="custom-cards">
                 <!-- IF LOGIN IT WILL SHOW IF NOT IT IS BLANK -->
-                <h2 class="pb-2">Post to adopt</h2>
-                <div class="mb-4">
-                    <button class="btn btn-primary" style="background-color: #704130 !important; border: none;" data-bs-toggle="modal" data-bs-target="#postPet">Post your pet to adopt +</button>
-                </div>
-                <hr class="featurette-divider">
+                <?php if ($is_authenticated) : ?>
+                    <h2 class="pb-2">Post to adopt</h2>
+                    <div class="mb-4">
+                        <button class="btn btn-primary" style="background-color: #704130 !important; border: none;" data-bs-toggle="modal" data-bs-target="#postPet">Post your pet to adopt +</button>
+                    </div>
+                    <hr class="featurette-divider">
+                <?php else : ?>
+                    <h2 class="pb-2">Post to adopt</h2>
+                    <div class="mb-4">
+                        <button class="btn btn-primary" style="background-color: #704130 !important; border: none;" id="postPetBtn">Post your pet to adopt +</button>
+                    </div>
+                    <hr class="featurette-divider">
+                <?php endif; ?>
 
                 <h2 class="pb-2">Available Pets</h2>
                 <!-- Filter Section -->
@@ -236,66 +319,71 @@ if (isset($_SESSION['user_id'])) {
     <div class="modal fade" id="postPet" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form method="POST">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
+
                     <div class="modal-header border-0">
                         <h5 class="modal-title">
                             <span class="fw-mediumbold"> Post pet for adopt</span>
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label>Pet Image</label><br>
+                            <input type="file" name="pet_image" accept="image/*"><br><br>
+                            <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Pet Image</label><br>
-                                    <input type="file"><br><br>
-                                    <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
-                                </div>
-                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Pet Name</label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_name" required />
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you dont know*)</span></label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
+                                    <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you don't know*)</span></label>
+                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_age" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Pet Type</label>
-                                    <select style="border: 2px solid grey;" class="form-select" id="exampleFormControlSelect1">
-                                        <option>Dog</option>
-                                        <option>Cat</option>
+                                    <select style="border: 2px solid grey;" class="form-select" name="pet_type">
+                                        <option value="Dog">Dog</option>
+                                        <option value="Cat">Cat</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Pet Breed</label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" placeholder="" required />
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="petCondition">Pet Condition</label>
-                                    <select style="border: 2px solid grey;" class="form-select" id="petCondition" onchange="toggleInput()">
-                                        <option value="healthy">Healthy</option>
-                                        <option value="sick">In sick</option>
-                                    </select>
-                                    <div id="specificSickInput" style="display: none;">
-                                        <label for="specificSick">Specific sickness:</label>
-                                        <input style="border: 2px solid grey" type="text" class="form-control" id="specificSick" name="specificSick">
-                                    </div>
+                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_breed" required />
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label for="petCondition">Pet Condition</label>
+                            <select style="border: 2px solid grey;" class="form-select" id="petCondition" name="pet_condition" onchange="toggleInput()">
+                                <option value="healthy">Healthy</option>
+                                <option value="in sick">In sick</option>
+                            </select>
+                            <div id="specificSickInput" style="display: none;">
+                                <label for="specificSick">Specific sickness:</label>
+                                <input style="border: 2px solid grey;" type="text" class="form-control" id="specificSick" name="specific_sickness">
+                            </div>
+                        </div>
                     </div>
+
                     <div class="modal-footer border-0">
-                        <input type="submit" class="btn btn-primary" style="background-color: #704130 !important; border: none;" value="Add">
+                        <input type="submit" name="request" class="btn btn-primary" style="background-color: #704130 !important; border: none;" value="Add">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -310,6 +398,7 @@ if (isset($_SESSION['user_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleInput() {
             var selectBox = document.getElementById("petCondition");
@@ -321,6 +410,20 @@ if (isset($_SESSION['user_id'])) {
                 specificSickInput.style.display = "none";
             }
         }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#postPetBtn').click(function() {
+                <?php if (!$is_authenticated) : ?>
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Please login first to post a pet',
+                        confirmButtonColor: '#704130'
+                    });
+                <?php endif; ?>
+            });
+        });
     </script>
 </body>
 

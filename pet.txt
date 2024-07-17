@@ -35,13 +35,13 @@ tbl_pets
 user_id (Foreign Key referencing tbl_users)
 pet_id (Primary Key)
 pet_name
-pet_description
 pet_age
 pet_type
 pet_breed
-pet_status (Enum: 'For adoption', 'Approved', 'Deleted')
-remarks (Approve or Rejected by Admin)
+pet_condition
+pet_status (Enum: 'Approve', 'Rejected')
 created_at
+updated_at
 
 
 tbl_adoption
