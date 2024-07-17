@@ -1,3 +1,49 @@
+<?php
+
+// INCLUDING CONNECTION TO DATABASE
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+$sql = "SELECT 
+            p.pet_id,
+            p.pet_image,
+            p.pet_name,
+            p.pet_age,
+            p.pet_type,
+            p.pet_breed,
+            p.pet_condition,
+            u.user_id AS pet_owner_id,
+            u.fullname AS pet_owner_name,
+            u.address AS pet_owner_address,
+            u.contact AS pet_owner_contact,
+            u.email AS pet_owner_email,
+            a.user_id AS adopted_user_id,
+            a.created_at AS adoption_date,
+            a.remarks AS adoption_status,
+            adopted_user.fullname AS adopted_user_fullname,
+            adopted_user.address AS adopted_user_address,
+            adopted_user.contact AS adopted_user_contact,
+            adopted_user.email AS adopted_user_email
+        FROM 
+            tbl_pets p
+        JOIN 
+            tbl_users u ON p.user_id = u.user_id
+        LEFT JOIN 
+            tbl_adoption a ON p.pet_id = a.pet_id
+        LEFT JOIN
+            tbl_users adopted_user ON a.user_id = adopted_user.user_id WHERE remarks = 'Requesting'";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$adoptionDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -62,7 +108,7 @@
                                         <table id="add-row" class="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Adopter Details</th>
+                                                    <th>Owner Details</th>
                                                     <th>Pet Details</th>
                                                     <th>Adoptor Details</th>
                                                     <th>Date Adopted</th>
@@ -70,43 +116,48 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span><i class="fas fa-user-circle"></i> Russel Vincent Cuevas</span> <br>
-                                                        <span><i class="fa fa-map-marker"></i> Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span><i class="fa fa-phone"></i> 09495748302</span> <br>
-                                                        <span><i class="fa fa-envelope"></i> russelcuevas0@gmail.com</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>
-                                                            <img style="height: 100px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
-                                                        </span><br>
-                                                        <span>
-                                                            Tiger
-                                                        </span> <br>
-                                                        <span>
-                                                            Dog
-                                                        </span> <br>
-                                                        <span>
-                                                            Labrador <br>
-                                                        </span>
-                                                        <span>
-                                                            Bawal sa malamig
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <span><i class="fas fa-user-circle"></i> Russel Vincent Cuevas</span> <br>
-                                                        <span><i class="fa fa-map-marker"></i> Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span><i class="fa fa-phone"></i> 09495748302</span> <br>
-                                                        <span><i class="fa fa-envelope"></i> russelcuevas0@gmail.com</span>
-                                                    </td>
-                                                    <td>
-                                                        <span style="font-size: 10px;">November 23 2024 / 7:00am</span>
-                                                    </td>
-                                                    <td>
-                                                        Pending
-                                                    </td>
-                                                </tr>
+                                                <?php foreach ($adoptionDetails as $adoption) : ?>
+                                                    <tr>
+                                                        <td>
+                                                            <span><i class="fas fa-user-circle"></i> <?php echo $adoption['pet_owner_name'] ?></span> <br>
+                                                            <span><i class="fa fa-map-marker"></i> <?php echo $adoption['pet_owner_address'] ?></span> <br>
+                                                            <span><i class="fa fa-phone"></i> <?php echo $adoption['pet_owner_contact'] ?></span> <br>
+                                                            <span><i class="fa fa-envelope"></i> <?php echo $adoption['pet_owner_email'] ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span>
+                                                                <img style="height: 100px;" src="../images/pet-images/<?php echo $adoption['pet_image'] ?>" alt="">
+                                                            </span><br>
+                                                            <span>
+                                                                <?php echo $adoption['pet_name'] ?>
+                                                            </span> <br>
+                                                            <span>
+                                                                <?php echo $adoption['pet_age'] ?>
+                                                            </span> <br>
+                                                            <span>
+                                                                <?php echo $adoption['pet_type'] ?>
+                                                            </span> <br>
+                                                            <span>
+                                                                <?php echo $adoption['pet_breed'] ?>
+                                                            </span> <br>
+                                                            <span>
+                                                                <?php echo $adoption['pet_condition'] ?>
+                                                            </span> <br>
+                                                        </td>
+                                                        <td>
+                                                            <span><i class="fas fa-user-circle"></i> <?php echo $adoption['adopted_user_fullname'] ?></span> <br>
+                                                            <span><i class="fa fa-map-marker"></i> <?php echo $adoption['adopted_user_address'] ?></span> <br>
+                                                            <span><i class="fa fa-phone"></i> <?php echo $adoption['adopted_user_contact'] ?></span> <br>
+                                                            <span><i class="fa fa-envelope"></i> <?php echo $adoption['adopted_user_email'] ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span style="font-size: 15px;"><?= date('F j, Y / g:ia', strtotime($adoption['adoption_date'])) ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <p style="font-size: 12px; font-weight: 900; color: orange"><?php echo $adoption['adoption_status'] ?></p>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>

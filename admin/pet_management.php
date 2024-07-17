@@ -19,6 +19,41 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // END PETS
 
+
+// DELETE USERS
+if (isset($_POST['delete'])) {
+    $pet_id = $_POST['pet_id'];
+
+    $select_image_query = $conn->prepare("SELECT pet_image FROM tbl_pets WHERE pet_id = ?");
+    $select_image_query->execute([$pet_id]);
+    $pet = $select_image_query->fetch(PDO::FETCH_ASSOC);
+
+    if (!$pet) {
+        $_SESSION['delete_error'] = "Pet not found.";
+        header('location: pet_management.php');
+        exit;
+    }
+
+    $image_path = '../images/pet-images/' . $pet['pet_image'];
+
+    if (file_exists($image_path)) {
+        unlink($image_path);
+    }
+
+    $delete_query = $conn->prepare("DELETE FROM tbl_pets WHERE pet_id = ?");
+    $delete_success = $delete_query->execute([$pet_id]);
+
+    if ($delete_success) {
+        $_SESSION['delete_success'] = "Pet deleted successfully.";
+    } else {
+        $_SESSION['delete_error'] = "Error deleting pet.";
+    }
+
+    header('location: pet_management.php');
+    exit;
+}
+// END DELETE USERS
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,7 +121,9 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <th>Pet Breed</th>
                                                     <th>Pet Description</th>
                                                     <th>Pet Age</th>
+                                                    <th style="width: 10%">Status</th>
                                                     <th style="width: 10%">Action</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -99,14 +136,38 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                         <td><?php echo $pet['pet_condition']; ?></td>
                                                         <td><?php echo $pet['pet_age']; ?></td>
                                                         <td>
+                                                            <p style="font-size: 13px; font-weight: 900; color: green; "><?php echo $pet['pet_status'] ?></p>
+                                                        </td>
+                                                        <td>
                                                             <div class="form-button-action">
-                                                                <a href="" class="btn btn-link btn-primary btn-lg">
-                                                                    <i class="fa fa-edit"></i>
-                                                                </a>
-                                                                <a style="margin-top: 5px;" href="" class="btn btn-link btn-danger">
+                                                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $pet['pet_id']; ?>" class="btn btn-link btn-danger btn-lg">
                                                                     <i class="fa fa-times"></i>
                                                                 </a>
                                                             </div>
+
+                                                            <!-- DELETE MODAL -->
+                                                            <div class="modal fade" id="delete_<?php echo $pet['pet_id'] ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form action="" method="POST">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title">Delete Pet</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id'] ?>">
+                                                                                <p>Are you sure you want to delete the pet "<?php echo $pet['pet_name']; ?>"?</p>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="submit" class="btn btn-danger" name="delete">Delete</button>
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- END DELETE MODAL -->
+
                                                         </td>
                                                     </tr>
                                                 <?php endforeach ?>
@@ -138,6 +199,46 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Fonts and icons -->
         <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- DELETE -->
+        <?php if (isset($_SESSION['delete_success'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '<?php echo $_SESSION['delete_success']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['delete_success']); ?>;
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['delete_error'])) : ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '<?php echo $_SESSION['delete_error']; ?>',
+                    confirmButtonText: 'OK'
+                })
+            </script>
+            <?php unset($_SESSION['delete_error']); ?>;
+        <?php endif; ?>
+        <!-- END DELETE -->
+
+        <script>
+            function toggleInputEdit(petId) {
+                var selectBox = document.getElementById("petCondition_" + petId);
+                var specificSickInput = document.getElementById("specificSickInput_" + petId);
+
+                if (selectBox.value === "in sick") {
+                    specificSickInput.style.display = "block";
+                } else {
+                    specificSickInput.style.display = "none";
+                }
+            }
+        </script>
         <script>
             function toggleInput() {
                 var selectBox = document.getElementById("petCondition");

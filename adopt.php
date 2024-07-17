@@ -87,6 +87,21 @@ if (isset($_POST['request'])) {
         echo "Sorry, your file was not uploaded. Make sure it is an image file and less than 500KB.";
     }
 }
+
+
+// READ THE PETS FOR ADOPTION
+$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+             FROM tbl_pets p
+             LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+             WHERE p.pet_status = "For adoption" 
+                 AND p.user_id <> ?';
+
+$get_stmt = $conn->prepare($get_pets);
+$get_stmt->execute([$_SESSION['user_id']]);
+$pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+// END PETS
+
 ?>
 
 <!DOCTYPE html>
@@ -211,90 +226,51 @@ if (isset($_POST['request'])) {
                 </div>
 
                 <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
-                    <div class="col">
-                        <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                                <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                                <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                                <p style="font-size: 20px;">Breed: Sample</p>
-                                <ul class="d-flex list-unstyled mt-auto">
-                                    <li class="me-auto">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                                    </li>
-                                    <li class="d-flex align-items-center me-3">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#geo-fill" />
-                                        </svg>
-                                        <small>Russel Vincent Cuevas</small>
-                                    </li>
-                                    <li class="d-flex align-items-center">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#calendar3" />
-                                        </svg>
-                                        <small>Today</small>
-                                    </li>
-                                </ul>
-                                <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                            </div>
+                    <?php foreach ($pets as $pet) : ?>
+                        <div class="col">
+                            <form id="adoptForm" action="ajax/adoption.php">
+                                <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+                                    <div class="badge bg-success mt-3">For Adoption</div>
+                                    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                                        <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
+                                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
+                                        <p style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
+                                        <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
+                                        <p style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
+                                        <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
+                                        <ul class="d-flex list-unstyled mt-auto">
+                                            <li class="me-auto">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                            </li>
+                                            <li class="d-flex align-items-center me-6">
+                                                <svg class="bi me-2" width="1em" height="1em">
+                                                    <use xlink:href="#geo-fill" />
+                                                </svg>
+                                                <small><?php echo $pet['owner_name'] ?></small>
+                                            </li>
+                                            <li class="d-flex align-items-center">
+                                                <svg class="bi me-2" width="1em" height="1em">
+                                                    <use xlink:href="#calendar3" />
+                                                </svg>
+                                                <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
+                                            </li>
+                                        </ul>
+                                        <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
+                                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                        <?php
+                                        $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
+                                        $stmt_check = $conn->prepare($check_requests);
+                                        $stmt_check->execute([$user_id]);
+                                        $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
+                                        ?>
+                                        <button type="submit" id="confirmAdopt" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                                <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                                <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                                <p style="font-size: 20px;">Breed: Sample</p>
-                                <ul class="d-flex list-unstyled mt-auto">
-                                    <li class="me-auto">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                                    </li>
-                                    <li class="d-flex align-items-center me-3">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#geo-fill" />
-                                        </svg>
-                                        <small>Russel Vincent Cuevas</small>
-                                    </li>
-                                    <li class="d-flex align-items-center">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#calendar3" />
-                                        </svg>
-                                        <small>Today</small>
-                                    </li>
-                                </ul>
-                                <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                                <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                                <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                                <p style="font-size: 20px;">Breed: Sample</p>
-                                <ul class="d-flex list-unstyled mt-auto">
-                                    <li class="me-auto">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                                    </li>
-                                    <li class="d-flex align-items-center me-3">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#geo-fill" />
-                                        </svg>
-                                        <small>Russel Vincent Cuevas</small>
-                                    </li>
-                                    <li class="d-flex align-items-center">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#calendar3" />
-                                        </svg>
-                                        <small>Today</small>
-                                    </li>
-                                </ul>
-                                <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                            </div>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
+
                 <!-- PAGINATION -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center">
@@ -313,118 +289,159 @@ if (isset($_POST['request'])) {
                 </nav>
             </div>
         </div>
-    </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="postPet" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
+        <!-- Modal -->
+        <div class="modal fade" id="postPet" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
 
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title">
-                            <span class="fw-mediumbold"> Post pet for adopt</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Pet Image</label><br>
-                            <input type="file" name="pet_image" accept="image/*"><br><br>
-                            <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title">
+                                <span class="fw-mediumbold"> Post pet for adopt</span>
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Pet Name</label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_name" required />
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Pet Image</label><br>
+                                <input type="file" name="pet_image" accept="image/*"><br><br>
+                                <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Pet Name</label>
+                                        <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_name" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you don't know*)</span></label>
+                                        <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_age" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you don't know*)</span></label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_age" />
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Pet Type</label>
+                                        <select style="border: 2px solid grey;" class="form-select" name="pet_type">
+                                            <option value="Dog">Dog</option>
+                                            <option value="Cat">Cat</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Pet Breed</label>
+                                        <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_breed" required />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="petCondition">Pet Condition</label>
+                                <select style="border: 2px solid grey;" class="form-select" id="petCondition" name="pet_condition" onchange="toggleInput()">
+                                    <option value="healthy">Healthy</option>
+                                    <option value="in sick">In sick</option>
+                                </select>
+                                <div id="specificSickInput" style="display: none;">
+                                    <label for="specificSick">Specific sickness:</label>
+                                    <input style="border: 2px solid grey;" type="text" class="form-control" id="specificSickInput" name="specific_sickness">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Pet Type</label>
-                                    <select style="border: 2px solid grey;" class="form-select" name="pet_type">
-                                        <option value="Dog">Dog</option>
-                                        <option value="Cat">Cat</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Pet Breed</label>
-                                    <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_breed" required />
-                                </div>
-                            </div>
+                        <div class="modal-footer border-0">
+                            <input type="submit" name="request" class="btn btn-primary" style="background-color: #704130 !important; border: none;" value="Add">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                         </div>
-
-                        <div class="form-group">
-                            <label for="petCondition">Pet Condition</label>
-                            <select style="border: 2px solid grey;" class="form-select" id="petCondition" name="pet_condition" onchange="toggleInput()">
-                                <option value="healthy">Healthy</option>
-                                <option value="in sick">In sick</option>
-                            </select>
-                            <div id="specificSickInput" style="display: none;">
-                                <label for="specificSick">Specific sickness:</label>
-                                <input style="border: 2px solid grey;" type="text" class="form-control" id="specificSickInput" name="specific_sickness">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer border-0">
-                        <input type="submit" name="request" class="btn btn-primary" style="background-color: #704130 !important; border: none;" value="Add">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="assets/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function toggleInput() {
-            var selectBox = document.getElementById("petCondition");
-            var specificSickInput = document.getElementById("specificSickInput");
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="assets/js/script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            $(document).ready(function() {
+                $('#adoptForm').on('submit', function(event) {
+                    event.preventDefault();
 
-            if (selectBox.value === "in sick") {
-                specificSickInput.style.display = "block";
-            } else {
-                specificSickInput.style.display = "none";
-            }
-        }
-    </script>
+                    var formData = $(this).serialize();
 
-    <script>
-        $(document).ready(function() {
-            $('#postPetBtn').click(function() {
-                <?php if (!$is_authenticated) : ?>
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Please login first to post a pet',
-                        confirmButtonColor: '#704130'
+                    $.ajax({
+                        url: 'ajax/adoption.php',
+                        type: 'POST',
+                        data: formData,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(response);
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message
+                                })
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to submit adopt request. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     });
-                <?php endif; ?>
+                });
             });
-        });
-    </script>
+        </script>
+
+        <script>
+            function toggleInput() {
+                var selectBox = document.getElementById("petCondition");
+                var specificSickInput = document.getElementById("specificSickInput");
+
+                if (selectBox.value === "in sick") {
+                    specificSickInput.style.display = "block";
+                } else {
+                    specificSickInput.style.display = "none";
+                }
+            }
+        </script>
+
+        <script>
+            $(document).ready(function() {
+                $('#postPetBtn').click(function() {
+                    <?php if (!$is_authenticated) : ?>
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Please login first to post a pet',
+                            confirmButtonColor: '#704130'
+                        });
+                    <?php endif; ?>
+                });
+            });
+        </script>
 </body>
 
 </html>
