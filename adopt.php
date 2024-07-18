@@ -91,16 +91,26 @@ if (isset($_POST['request'])) {
 
 
 // READ THE PETS FOR ADOPTION
-$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
-                u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
-             FROM tbl_pets p
-             LEFT JOIN tbl_users u ON p.user_id = u.user_id 
-             WHERE p.pet_status = "For adoption" 
-                 AND p.user_id <> ?';
-
-$get_stmt = $conn->prepare($get_pets);
-$get_stmt->execute([$_SESSION['user_id']]);
-$pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($is_authenticated) {
+    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+                 FROM tbl_pets p
+                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+                 WHERE p.pet_status = "For adoption" 
+                     AND p.user_id <> ?';
+    $get_stmt = $conn->prepare($get_pets);
+    $get_stmt->execute([$_SESSION['user_id']]);
+    $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+                 FROM tbl_pets p
+                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+                 WHERE p.pet_status = "For adoption"';
+    $get_stmt = $conn->prepare($get_pets);
+    $get_stmt->execute();
+    $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 // END PETS
 
 ?>
@@ -276,15 +286,17 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
                                             </li>
                                         </ul>
-                                        <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
-                                        <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-                                        <?php
-                                        $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
-                                        $stmt_check = $conn->prepare($check_requests);
-                                        $stmt_check->execute([$_SESSION['user_id']]);
-                                        $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
-                                        ?>
-                                        <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                        <?php if ($is_authenticated) : ?>
+                                            <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
+                                            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                            <?php
+                                            $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
+                                            $stmt_check = $conn->prepare($check_requests);
+                                            $stmt_check->execute([$_SESSION['user_id']]);
+                                            $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
+                                            ?>
+                                            <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </form>
