@@ -64,7 +64,7 @@ $sql =
         LEFT JOIN
             tbl_users adopted_user ON a.user_id = adopted_user.user_id
         WHERE 
-           (a.remarks = 'Requesting' OR a.remarks = 'Ready to pick up')
+           (a.remarks = 'Requesting' OR a.remarks = 'Ready to pick up' OR a.remarks = 'Completed')
             AND a.user_id = :user_id";
 
 $stmt = $conn->prepare($sql);
@@ -111,6 +111,46 @@ $stmt = $conn->prepare($sql);
 $stmt->bindValue(':user_id', $user_id);
 $stmt->execute();
 $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// END OTHERS ADOPTION
+
+// OTHERS ADOPTION REQUEST
+$sql = "SELECT 
+            p.pet_id,
+            p.pet_image,
+            p.pet_name,
+            p.pet_age,
+            p.pet_type,
+            p.pet_breed,
+            p.pet_condition,
+            p.user_id AS pet_owner_id,
+            u1.fullname AS pet_owner_name,
+            u1.address AS pet_owner_address,
+            u1.contact AS pet_owner_contact,
+            u1.email AS pet_owner_email,
+            a.adoption_id,
+            a.user_id AS adopted_user_id,
+            u2.fullname AS adopted_user_fullname,
+            u2.address AS adopted_user_address,
+            u2.contact AS adopted_user_contact,
+            u2.email AS adopted_user_email,
+            a.created_at AS adoption_date,
+            a.remarks AS adoption_status
+        FROM 
+            tbl_pets p
+        JOIN 
+            tbl_users u1 ON p.user_id = u1.user_id
+        LEFT JOIN 
+            tbl_adoption a ON p.pet_id = a.pet_id
+        LEFT JOIN
+            tbl_users u2 ON a.user_id = u2.user_id
+        WHERE 
+            a.remarks = 'Ready to pick up'
+            AND p.user_id = :user_id";
+
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':user_id', $user_id);
+$stmt->execute();
+$to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // END OTHERS ADOPTION
 
 ?>
@@ -200,6 +240,8 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="list-home">My posted pet</a>
                         <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">My adopted pet</a>
                         <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Adoption request</a>
+                        <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">To pick up</a>
+
                     </div>
                 </div>
                 <div class="col-md-8 mt-5">
@@ -371,8 +413,61 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                         <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
-                            <h4>Settings</h4>
-                            <p>Adjust your account settings and preferences.</p>
+                            <div class="box" style="border: 2px solid brown; padding: 20px;">
+                                <div class="table-responsive">
+                                    <table id="example4" class="table table-dark table-hover table-striped table-bordered">
+                                        <thead class="table-secondary">
+                                            <tr>
+                                                <th>My Details</th>
+                                                <th>Pet Details</th>
+                                                <th>Adoptor Details</th>
+                                                <th>Date Adopted</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($to_pick_up as $request) : ?>
+                                                <tr>
+                                                    <td>
+                                                        <?php echo $request['pet_owner_name']; ?><br>
+                                                        <?php echo $request['pet_owner_address']; ?><br>
+                                                        <?php echo $request['pet_owner_contact']; ?><br>
+                                                        <?php echo $request['pet_owner_email']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <img style="height: 75px;" src="images/pet-images/<?php echo $request['pet_image'] ?>" alt="">
+
+                                                        <?php echo $request['pet_name']; ?><br>
+                                                        <?php echo $request['pet_age']; ?><br>
+                                                        <?php echo $request['pet_type']; ?><br>
+                                                        <?php echo $request['pet_breed']; ?><br>
+                                                        <?php echo $request['pet_condition']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $request['adopted_user_fullname']; ?><br>
+                                                        <?php echo $request['adopted_user_address']; ?><br>
+                                                        <?php echo $request['adopted_user_contact']; ?><br>
+                                                        <?php echo $request['adopted_user_email']; ?>
+                                                    </td>
+                                                    <td><?php echo $request['adoption_date']; ?></td>
+                                                    <td><?php echo $request['adoption_status']; ?></td>
+                                                    <td>
+                                                        <div style="display: flex; justify-content: space-between;">
+                                                            <a href="#" class="btn btn-link  completed-btn" data-adoption-id="<?php echo $request['adoption_id']; ?>">
+                                                                <i style="color: green;" class="fa fa-check"> Completed</i>
+                                                            </a>
+                                                            <a href="#" class="btn btn-link cancel-btn" data-adoption-id="<?php echo $request['adoption_id']; ?>">
+                                                                <i style="color: brown;" class="fa fa-times"> Cancel</i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -389,6 +484,7 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- READY TO PICK UP -->
     <script>
         $(document).ready(function() {
             $('.approve-btn').click(function(e) {
@@ -425,7 +521,9 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         });
     </script>
+    <!-- END READY TO PICK UP -->
 
+    <!-- REJECTED -->
     <script>
         $('.reject-btn').click(function(e) {
             e.preventDefault();
@@ -472,6 +570,48 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         });
     </script>
+    <!-- END REJECTED -->
+
+    <!-- COMPLETED -->
+    <script>
+        $(document).ready(function() {
+            $('.completed-btn').click(function(e) {
+                e.preventDefault();
+
+                var adoption_id = $(this).data('adoption-id');
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'ajax/completed.php',
+                    data: {
+                        adoption_id: adoption_id,
+                        action: 'completed'
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+
 
     <script>
         $(document).ready(function() {
@@ -498,6 +638,17 @@ $other_request = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $(document).ready(function() {
             var table = $('#example3').DataTable({
+                "dom": '<lf<t>ip<l>',
+                "ordering": true,
+                "info": false,
+                "paging": true,
+                "bLengthChange": false,
+                "searching": false,
+            });
+        });
+
+        $(document).ready(function() {
+            var table = $('#example4').DataTable({
                 "dom": '<lf<t>ip<l>',
                 "ordering": true,
                 "info": false,

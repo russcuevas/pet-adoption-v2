@@ -37,7 +37,7 @@ $sql = "SELECT
         LEFT JOIN 
             tbl_adoption a ON p.pet_id = a.pet_id
         LEFT JOIN
-            tbl_users adopted_user ON a.user_id = adopted_user.user_id WHERE remarks = 'Requesting'";
+            tbl_users adopted_user ON a.user_id = adopted_user.user_id WHERE remarks = 'Requesting' OR remarks = 'Ready to pick up' OR remarks = 'Completed'";
 
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -154,7 +154,13 @@ $adoptionDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                             <span style="font-size: 15px;"><?= date('F j, Y / g:ia', strtotime($adoption['adoption_date'])) ?></span>
                                                         </td>
                                                         <td>
-                                                            <p style="font-size: 12px; font-weight: 900; color: orange"><?php echo $adoption['adoption_status'] ?></p>
+                                                            <?php if ($adoption['adoption_status'] === 'Requesting') : ?>
+                                                                <p style="font-size: 12px; font-weight: 900; color: orange"><?php echo $adoption['adoption_status'] ?></p>
+                                                            <?php elseif ($adoption['adoption_status'] === 'Ready to pick up') : ?>
+                                                                <p style="font-size: 12px; font-weight: 900; color: red"><?php echo $adoption['adoption_status'] ?></p>
+                                                            <?php else : ?>
+                                                                <p style="font-size: 12px; font-weight: 900; color: green"><?php echo $adoption['adoption_status'] ?></p>
+                                                            <?php endif ?>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>

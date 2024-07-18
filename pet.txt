@@ -1,6 +1,5 @@
 ADMIN MANAGEMENT
 CRUD - Users
-CRUD - Pet
 CRUD - Approval
 Analytics - Total of Users, Pet, Total Approve
 
@@ -61,6 +60,22 @@ event_description
 created_at
 updated_at
 
+
 tbl_reports
+report_id
+owner_fullname
+owner_email
+owner_contact
+owner_address
+pet_name
+pet_age
+pet_type
+pet_breed
+pet_condition
+adoptor_fullname
+adoptor_email
+adoptor_contact
+adoptor_address
+status -> Completed
 
 
