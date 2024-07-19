@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 18, 2024 at 01:12 PM
+-- Generation Time: Jul 19, 2024 at 07:31 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -99,6 +99,31 @@ CREATE TABLE `tbl_pets` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_reports`
+--
+
+CREATE TABLE `tbl_reports` (
+  `report_id` int(11) NOT NULL,
+  `owner_fullname` varchar(100) NOT NULL,
+  `owner_email` varchar(100) NOT NULL,
+  `owner_contact` varchar(20) NOT NULL,
+  `owner_address` text NOT NULL,
+  `pet_name` varchar(100) NOT NULL,
+  `pet_age` int(11) NOT NULL,
+  `pet_type` varchar(50) NOT NULL,
+  `pet_breed` varchar(100) NOT NULL,
+  `pet_condition` text NOT NULL,
+  `adoptor_fullname` varchar(100) DEFAULT NULL,
+  `adoptor_email` varchar(100) DEFAULT NULL,
+  `adoptor_contact` varchar(20) DEFAULT NULL,
+  `adoptor_address` text DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
+  `status` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_users`
 --
 
@@ -145,6 +170,12 @@ ALTER TABLE `tbl_pets`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `tbl_reports`
+--
+ALTER TABLE `tbl_reports`
+  ADD PRIMARY KEY (`report_id`);
+
+--
 -- Indexes for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
@@ -165,25 +196,31 @@ ALTER TABLE `tbl_admin`
 -- AUTO_INCREMENT for table `tbl_adoption`
 --
 ALTER TABLE `tbl_adoption`
-  MODIFY `adoption_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `adoption_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `tbl_news_announcement`
 --
 ALTER TABLE `tbl_news_announcement`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tbl_pets`
 --
 ALTER TABLE `tbl_pets`
-  MODIFY `pet_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `pet_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `tbl_reports`
+--
+ALTER TABLE `tbl_reports`
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
-  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables

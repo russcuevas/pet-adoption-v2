@@ -69,10 +69,11 @@ $reports = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="card-header">
                                     <div class="d-flex align-items-center">
                                         <h4 class="card-title"></h4>
-                                        <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addRowModal">
-                                            <i class="fas fa-file-pdf"></i> &nbsp;
-                                            Export PDF
+                                        <button class="btn btn-primary btn-round ms-auto" onclick="window.open('print/print_report.php', '_blank', 'width=800,height=600')">
+                                            <i class="fas fa-file"></i> &nbsp;
+                                            Download for Print
                                         </button>
+
                                     </div>
                                 </div>
                                 <div class="card-body">
