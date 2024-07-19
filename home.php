@@ -154,7 +154,7 @@ if ($is_authenticated) {
             <h2 class="pb-2" style="text-align: center;">Pet Care Tips</h2>
             <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
                 <div class="col">
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm" style="border: 2px solid #704130 !important">
                         <div class="card-body py-4">
                             <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
                                 <img src="images/pet-care/dog.svg" alt="Dog Icon" width="32" height="32">
@@ -165,7 +165,7 @@ if ($is_authenticated) {
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm" style="border: 2px solid #704130 !important">
                         <div class="card-body py-4">
                             <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
                                 <img src="images/pet-care/foot.svg" alt="Foot Icon" width="32" height="32">
@@ -176,7 +176,7 @@ if ($is_authenticated) {
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm" style="border: 2px solid #704130 !important">
                         <div class="card-body py-4">
                             <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-gradient rounded-circle">
                                 <img src="images/pet-care/cat.svg" alt="Cat Icon" width="32" height="32">
