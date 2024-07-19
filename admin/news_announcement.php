@@ -429,6 +429,36 @@ if (isset($_POST['delete'])) {
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        <!-- UPDATE PROFILE -->
+        <?php if (isset($_SESSION['profile_update_success'])) : ?>
+            <script>
+                $(document).ready(function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: '<?php echo $_SESSION['profile_update_success']; ?>',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
+            <?php unset($_SESSION['profile_update_success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['profile_update_error'])) : ?>
+            <script>
+                $(document).ready(function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '<?php echo $_SESSION['profile_update_error']; ?>',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
+            <?php unset($_SESSION['profile_update_error']); ?>
+        <?php endif; ?>
+        <!-- END UPDATE PROFILE -->
+
         <!-- SWEETALERT -->
 
         <!-- CREATE-->

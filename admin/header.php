@@ -134,22 +134,30 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form method="post" action="update_profile.php">
           <div class="mb-3">
             <label for="fullname" class="form-label">Fullname</label>
-            <input style="border: 2px solid grey" type="fullname" class="form-control" id="fullname" placeholder="" required>
+            <input style="border: 2px solid grey" type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" value="<?php echo htmlspecialchars($admin['fullname']); ?>" required>
           </div>
           <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
-            <input style="border: 2px solid grey" type="email" class="form-control" id="email" placeholder="" required>
+            <input style="border: 2px solid grey" type="email" class="form-control" id="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($admin['email']); ?>" required>
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input style="border: 2px solid grey" type="text" class="form-control" id="address" name="address" placeholder="Address" value="<?php echo htmlspecialchars($admin['address']); ?>" required>
+          </div>
+          <div class="mb-3">
+            <label for="contact" class="form-label">Contact</label>
+            <input style="border: 2px solid grey" type="text" class="form-control" id="contact" name="contact" placeholder="Contact" value="<?php echo htmlspecialchars($admin['contact']); ?>" required>
           </div>
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input style="border: 2px solid grey" type="password" class="form-control" id="password" placeholder="" required>
+            <input style="border: 2px solid grey" type="password" class="form-control" id="password" name="password" placeholder="Password">
           </div>
           <div class="mb-3">
             <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <input style="border: 2px solid grey" type="password" class="form-control" id="confirmPassword" placeholder="" required>
+            <input style="border: 2px solid grey" type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
           </div>
           <div class="modal-footer border-0">
             <input type="submit" class="btn btn-primary" value="Save Changes">
