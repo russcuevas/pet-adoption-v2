@@ -4,19 +4,52 @@ include 'database/connection.php';
 session_start();
 
 // DISPLAY FULLNAME IF LOGGED IN
+$is_authenticated = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+
+// Get user's full name if authenticated
 $fullname = '';
-if (isset($_SESSION['user_id'])) {
+if ($is_authenticated) {
     $user_id = $_SESSION['user_id'];
-    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = $user_id";
-    $stmt = $conn->query($get_user);
+    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = ?";
+    $stmt = $conn->prepare($get_user);
+    $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    $fullname = $user['fullname'];
+    if ($user) {
+        $fullname = $user['fullname'];
+    }
 }
 
 // FETCH NEWS AND ANNOUNCEMENTS
 $get_news = "SELECT * FROM `tbl_news_announcement` LIMIT 4";
 $get_stmt = $conn->query($get_news);
 $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+// READ THE PETS FOR ADOPTION
+if ($is_authenticated) {
+    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+                 FROM tbl_pets p
+                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+                 WHERE p.pet_status = "For adoption" 
+                     AND p.user_id <> ?
+                 LIMIT 3';
+    $get_stmt = $conn->prepare($get_pets);
+    $get_stmt->execute([$_SESSION['user_id']]);
+    $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+                 FROM tbl_pets p
+                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+                 WHERE p.pet_status = "For adoption"
+                 LIMIT 3';
+    $get_stmt = $conn->prepare($get_pets);
+    $get_stmt->execute();
+    $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+// END PETS
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,120 +189,85 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <h2 class="pb-2 mb-5">News & Announcement</h2>
         <div class="row mb-2">
-            <?php foreach ($announcements as $announcement) : ?>
-                <div class="col-md-6">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="row g-0">
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                    <h3 class="card-title"><?php echo $announcement['event_title'] ?></h3>
-                                    <p class="card-text mb-1"><small class="text-muted"><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></small></p>
-                                    <p class="card-text"><?php echo substr($announcement['event_description'], 0, 10) . '...' ?></p>
-                                    <a href="single_news.php?event_id=<?php echo $announcement['event_id']; ?>" class="stretched-link">Continue reading</a>
+            <?php if (empty($announcements)) : ?>
+                <div style="border: 2px solid #704130; padding: 20px;">
+                    <h1 style="text-align: center; font-weight: bold;">No news and announcements posted</h1>
+                </div>
+            <?php else : ?>
+                <?php foreach ($announcements as $announcement) : ?>
+                    <div class="col-md-6">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="row g-0">
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                        <h3 class="card-title"><?php echo $announcement['event_title'] ?></h3>
+                                        <p class="card-text mb-1"><small class="text-muted"><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></small></p>
+                                        <p class="card-text"><?php echo substr($announcement['event_description'], 0, 10) . '...' ?></p>
+                                        <a href="single_news.php?event_id=<?php echo $announcement['event_id']; ?>" class="stretched-link">Continue reading</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <img style="height: auto; width: auto" src="assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Image" class="img-fluid rounded-start">
+                                <div class="col-md-4">
+                                    <img style="height: auto; width: auto" src="assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Image" class="img-fluid rounded-start">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach ?>
-
+                <?php endforeach ?>
+                <a style="display: flex; align-items: center; justify-content: center;" href="news_announcement.php">View all</a>
+            <?php endif ?>
         </div>
-        <a style="display: flex; align-items: center; justify-content: center;" href="news_announcement.php">View all</a>
-
         <br>
         <br>
         <br>
 
         <h2 class="pb-2">List of Available Pets</h2>
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
-
-            <div class="col">
-                <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                        <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                        <p style="font-size: 20px;">Breed: Sample</p>
-                        <ul class="d-flex list-unstyled mt-auto">
-                            <li class="me-auto">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                            </li>
-                            <li class="d-flex align-items-center me-3">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#geo-fill" />
-                                </svg>
-                                <small>Russel Vincent Cuevas</small>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#calendar3" />
-                                </svg>
-                                <small>Today</small>
-                            </li>
-                        </ul>
-                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                    </div>
+            <?php foreach ($pets as $pet) : ?>
+                <div class="col">
+                    <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
+                        <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+                            <div class="badge bg-success mt-3">For Adoption</div>
+                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                                <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
+                                <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
+                                <p class="pet-breed" style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
+                                <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
+                                <p class="pet-age" style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
+                                <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
+                                <ul class="d-flex list-unstyled mt-auto">
+                                    <li class="me-auto">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                    </li>
+                                    <li class="d-flex align-items-center me-6">
+                                        <svg class="bi me-2" width="1em" height="1em">
+                                            <use xlink:href="#geo-fill" />
+                                        </svg>
+                                        <small><?php echo $pet['owner_name'] ?></small>
+                                    </li>
+                                    <li class="d-flex align-items-center">
+                                        <svg class="bi me-2" width="1em" height="1em">
+                                            <use xlink:href="#calendar3" />
+                                        </svg>
+                                        <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
+                                    </li>
+                                </ul>
+                                <?php if ($is_authenticated) : ?>
+                                    <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
+                                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                    <?php
+                                    $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
+                                    $stmt_check = $conn->prepare($check_requests);
+                                    $stmt_check->execute([$_SESSION['user_id']]);
+                                    $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
+                                    ?>
+                                    <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-
-            <div class="col">
-                <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                        <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                        <p style="font-size: 20px;">Breed: Sample</p>
-                        <ul class="d-flex list-unstyled mt-auto">
-                            <li class="me-auto">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                            </li>
-                            <li class="d-flex align-items-center me-3">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#geo-fill" />
-                                </svg>
-                                <small>Russel Vincent Cuevas</small>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#calendar3" />
-                                </svg>
-                                <small>Today</small>
-                            </li>
-                        </ul>
-                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                        <img style="border-radius: 50px; height: 200px;" src="https://i0.wp.com/doggybiome.com/wp-content/uploads/2022/08/DoggyBiome-DogPlaying-1789057343-1660165325547.jpg?resize=1048%2C779&ssl=1" alt="">
-                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: Dog</h3>
-                        <p style="font-size: 20px;">Breed: Sample</p>
-                        <ul class="d-flex list-unstyled mt-auto">
-                            <li class="me-auto">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                            </li>
-                            <li class="d-flex align-items-center me-3">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#geo-fill" />
-                                </svg>
-                                <small>Russel Vincent Cuevas</small>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <svg class="bi me-2" width="1em" height="1em">
-                                    <use xlink:href="#calendar3" />
-                                </svg>
-                                <small>Today</small>
-                            </li>
-                        </ul>
-                        <button style="background-color: #704130 !important; border: none;" class="btn btn-primary">Adopt</button>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
         <a style="display: flex; align-items: center; justify-content: center;" href="adopt.php">View all</a>
     </div>

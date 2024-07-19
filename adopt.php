@@ -97,21 +97,59 @@ if ($is_authenticated) {
                  FROM tbl_pets p
                  LEFT JOIN tbl_users u ON p.user_id = u.user_id 
                  WHERE p.pet_status = "For adoption" 
-                     AND p.user_id <> ?';
+                     AND p.user_id <> ?
+                     LIMIT 6';
     $get_stmt = $conn->prepare($get_pets);
     $get_stmt->execute([$_SESSION['user_id']]);
     $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+    $get_pets =
+        'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
                     u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
                  FROM tbl_pets p
                  LEFT JOIN tbl_users u ON p.user_id = u.user_id 
-                 WHERE p.pet_status = "For adoption"';
+                 WHERE p.pet_status = "For adoption"
+                     LIMIT 6';
     $get_stmt = $conn->prepare($get_pets);
     $get_stmt->execute();
     $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 // END PETS
+
+// PAGINATION
+$items_per_page = 6;
+$total_items = 0;
+
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $items_per_page;
+$count_query = 'SELECT COUNT(*) AS total FROM tbl_pets WHERE pet_status = "For adoption"';
+if ($is_authenticated) {
+    $count_query .= ' AND user_id <> ?';
+}
+$count_stmt = $conn->prepare($count_query);
+if ($is_authenticated) {
+    $count_stmt->execute([$_SESSION['user_id']]);
+} else {
+    $count_stmt->execute();
+}
+$total_items = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+             FROM tbl_pets p
+             LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+             WHERE p.pet_status = "For adoption"';
+if ($is_authenticated) {
+    $get_pets .= ' AND p.user_id <> ?';
+}
+$get_pets .= ' LIMIT :offset, :items_per_page';
+$get_stmt = $conn->prepare($get_pets);
+if ($is_authenticated) {
+    $get_stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+}
+$get_stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$get_stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
+$get_stmt->execute();
+$pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -308,19 +346,22 @@ if ($is_authenticated) {
                 <!-- PAGINATION -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        <li class="page-item<?php if ($current_page <= 1) echo ' disabled'; ?>">
+                            <a class="page-link" href="?page=<?php echo max(1, $current_page - 1); ?>" tabindex="-1" aria-disabled="true">Previous</a>
                         </li>
-                        <li class="page-item active" aria-current="page">
-                            <a class="page-link" href="#">1 <span class="visually-hidden">(current)</span></a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
+                        <?php
+                        $total_pages = ceil($total_items / $items_per_page);
+                        for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item<?php if ($i == $current_page) echo ' active'; ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item<?php if ($current_page >= $total_pages) echo ' disabled'; ?>">
+                            <a class="page-link" href="?page=<?php echo min($total_pages, $current_page + 1); ?>">Next</a>
                         </li>
                     </ul>
                 </nav>
+
             </div>
         </div>
 
