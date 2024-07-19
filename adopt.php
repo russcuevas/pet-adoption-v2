@@ -373,8 +373,8 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Pet Image</label><br>
-                                <input type="file" name="pet_image" accept="image/*"><br><br>
-                                <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                                <input type="file" id="pet_image" name="pet_image" accept="image/*"><br><br>
+                                <img id="diplay_pet_image" style="height: 70px;" src="https://cdn4.iconfinder.com/data/icons/documents-36/25/add-picture-1024.png" alt="">
                             </div>
 
                             <div class="row">
@@ -386,7 +386,7 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Pet Age <span style="font-size: 10px; color: red;">(leave blank if you don't know*)</span></label>
+                                        <label>Pet Age</label>
                                         <input style="border: 2px solid grey;" type="text" class="form-control" name="pet_age" />
                                     </div>
                                 </div>
@@ -440,6 +440,21 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="assets/js/script.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- PET CHANGE IMAGE -->
+        <script>
+            document.getElementById('pet_image').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('diplay_pet_image').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+        <!-- END PET CHANGE -->
 
         <script>
             // DYNAMIC FILTERRING

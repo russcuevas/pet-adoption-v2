@@ -242,8 +242,8 @@ if (isset($_POST['delete'])) {
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label>Image</label><br>
-                                                                    <input type="file" name="event_image" required><br><br>
-                                                                    <img style="height: 70px;" src="https://th.bing.com/th/id/OIP.mA_5Jzd0hjmCnEBy3kNhIAHaFB?rs=1&pid=ImgDetMain" alt="">
+                                                                    <input type="file" id="event_image" name="event_image" required><br><br>
+                                                                    <img id="display_image" style="height: 70px;" src="https://cdn4.iconfinder.com/data/icons/documents-36/25/add-picture-1024.png" alt="">
                                                                     <br>
                                                                     <?php if (isset($_SESSION['upload_error']['image'])) : ?>
                                                                         <span class="text-danger">* <?php echo $_SESSION['upload_error']['image']; ?></span>
@@ -333,7 +333,8 @@ if (isset($_POST['delete'])) {
 
                                                                                         <div class="form-group">
                                                                                             <label>Update Image</label><br>
-                                                                                            <input type="file" name="event_image">
+                                                                                            <input type="file" id="update_event_image" name="event_image" required><br><br>
+                                                                                            <img id="update_display_image" style="height: 70px;" src="https://cdn4.iconfinder.com/data/icons/documents-36/25/add-picture-1024.png" alt="">
                                                                                             <br>
                                                                                             <?php if (isset($_SESSION['update_upload_error'])) : ?>
                                                                                                 <span class="text-danger"><?php echo $_SESSION['update_upload_error']; ?></span>
@@ -428,6 +429,35 @@ if (isset($_POST['delete'])) {
         <script src="assets/js/plugin/webfont/webfont.min.js"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- DISPLAY IMAGE -->
+        <script>
+            document.getElementById('event_image').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('display_image').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+        <!-- END DISPLAY IMAGE -->
+        <script>
+            document.getElementById('update_event_image').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('update_display_image').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+
+        <!-- UPDATE IMAGE DISPLAY -->
 
         <!-- UPDATE PROFILE -->
         <?php if (isset($_SESSION['profile_update_success'])) : ?>
