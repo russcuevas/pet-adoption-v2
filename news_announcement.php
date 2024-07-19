@@ -115,65 +115,69 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="row mb-2">
-                <?php foreach ($announcements as $announcement) : ?>
-                    <div class="col-md-6">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="row g-0">
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-success mb-2">News & Announcement</h5>
-                                        <h3 class="card-title"><?php echo $announcement['event_title'] ?></h3>
-                                        <p class="card-text mb-1"><small class="text-muted"><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></small></p>
-                                        <p class="card-text"><?php echo substr($announcement['event_description'], 0, 10) . '...' ?></p>
-                                        <a href="single_news.php?event_id=<?php echo $announcement['event_id']; ?>" class="stretched-link">Continue reading</a>
+                <?php if (empty($announcements)) : ?>
+                    <div style="border: 2px solid #704130; padding: 20px;">
+                        <h1 style="text-align: center; font-weight: bold; color: brown;">No news and announcements posted</h1>
+                    </div>
+                <?php else : ?>
+                    <?php foreach ($announcements as $announcement) : ?>
+                        <div class="col-md-6">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="row g-0">
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-success mb-2">News & Announcement</h5>
+                                            <h3 class="card-title"><?php echo $announcement['event_title'] ?></h3>
+                                            <p class="card-text mb-1"><small class="text-muted"><?php echo date_format(new DateTime($announcement['event_schedule']), 'F j Y / h:i A'); ?></small></p>
+                                            <p class="card-text"><?php echo substr($announcement['event_description'], 0, 10) . '...' ?></p>
+                                            <a href="single_news.php?event_id=<?php echo $announcement['event_id']; ?>" class="stretched-link">Continue reading</a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <img style="height: auto; width: auto" src="assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Image" class="img-fluid rounded-start">
+                                    <div class="col-md-4">
+                                        <img style="height: auto; width: auto" src="assets/event_image/<?php echo $announcement['event_image'] ?>" alt="Image" class="img-fluid rounded-start">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach ?>
+                    <?php endforeach ?>
 
+                    <!-- PAGINATION -->
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <?php if ($page > 1) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="news_announcement.php?page=<?php echo $page - 1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php else : ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                            <?php endif; ?>
 
-                <!-- PAGINATION -->
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <?php if ($page > 1) : ?>
-                            <li class="page-item">
-                                <a class="page-link" href="news_announcement.php?page=<?php echo $page - 1; ?>" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        <?php else : ?>
-                            <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
-                            </li>
-                        <?php endif; ?>
+                            <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                                <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
+                                    <a class="page-link" href="news_announcement.php?page=<?php echo $i; ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
 
-                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
-                            <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
-                                <a class="page-link" href="news_announcement.php?page=<?php echo $i; ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            </li>
-                        <?php endfor; ?>
-
-                        <?php if ($page < $total_pages) : ?>
-                            <li class="page-item">
-                                <a class="page-link" href="news_announcement.php?page=<?php echo $page + 1; ?>" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        <?php else : ?>
-                            <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </nav>
-
+                            <?php if ($page < $total_pages) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="news_announcement.php?page=<?php echo $page + 1; ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else : ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                <?php endif ?>
             </div>
         </div>
 

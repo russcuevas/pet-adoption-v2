@@ -28,9 +28,7 @@ if (isset($_POST['request'])) {
     $pet_breed = htmlspecialchars($_POST['pet_breed']);
     $pet_condition = htmlspecialchars($_POST['pet_condition']);
 
-    if (
-        $pet_condition === "in sick"
-    ) {
+    if ($pet_condition === "in sick") {
         $specific_sickness = isset($_POST['specific_sickness']) ? htmlspecialchars($_POST['specific_sickness']) : null;
         if (!empty($specific_sickness)) {
             $pet_condition .= " - Specific: " . $specific_sickness;
@@ -45,9 +43,7 @@ if (isset($_POST['request'])) {
 
     if (!empty($_FILES["pet_image"]["tmp_name"])) {
         $check = getimagesize($_FILES["pet_image"]["tmp_name"]);
-        if (
-            $check === false
-        ) {
+        if ($check === false) {
             $uploadOk = 0;
         }
     } else {
@@ -58,9 +54,7 @@ if (isset($_POST['request'])) {
         $uploadOk = 0;
     }
 
-    if (
-        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif"
-    ) {
+    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
         $uploadOk = 0;
     }
 
@@ -89,32 +83,25 @@ if (isset($_POST['request'])) {
     }
 }
 
-
 // READ THE PETS FOR ADOPTION
+$get_pets_base_query = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
+                        u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
+                     FROM tbl_pets p
+                     LEFT JOIN tbl_users u ON p.user_id = u.user_id 
+                     WHERE p.pet_status = "For adoption"';
+
 if ($is_authenticated) {
-    $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
-                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
-                 FROM tbl_pets p
-                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
-                 WHERE p.pet_status = "For adoption" 
-                     AND p.user_id <> ?
-                     LIMIT 6';
-    $get_stmt = $conn->prepare($get_pets);
-    $get_stmt->execute([$_SESSION['user_id']]);
+    $get_pets_query = $get_pets_base_query . ' AND p.user_id <> :user_id LIMIT 6';
+    $get_stmt = $conn->prepare($get_pets_query);
+    $get_stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+    $get_stmt->execute();
     $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $get_pets =
-        'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
-                    u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
-                 FROM tbl_pets p
-                 LEFT JOIN tbl_users u ON p.user_id = u.user_id 
-                 WHERE p.pet_status = "For adoption"
-                     LIMIT 6';
-    $get_stmt = $conn->prepare($get_pets);
+    $get_pets_query = $get_pets_base_query . ' LIMIT 6';
+    $get_stmt = $conn->prepare($get_pets_query);
     $get_stmt->execute();
     $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-// END PETS
 
 // PAGINATION
 $items_per_page = 6;
@@ -124,34 +111,30 @@ $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($current_page - 1) * $items_per_page;
 $count_query = 'SELECT COUNT(*) AS total FROM tbl_pets WHERE pet_status = "For adoption"';
 if ($is_authenticated) {
-    $count_query .= ' AND user_id <> ?';
+    $count_query .= ' AND user_id <> :user_id';
 }
 $count_stmt = $conn->prepare($count_query);
 if ($is_authenticated) {
-    $count_stmt->execute([$_SESSION['user_id']]);
-} else {
-    $count_stmt->execute();
+    $count_stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 }
+$count_stmt->execute();
 $total_items = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
-$get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
-                u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
-             FROM tbl_pets p
-             LEFT JOIN tbl_users u ON p.user_id = u.user_id 
-             WHERE p.pet_status = "For adoption"';
+
+$get_pets_paginated = $get_pets_base_query;
 if ($is_authenticated) {
-    $get_pets .= ' AND p.user_id <> ?';
+    $get_pets_paginated .= ' AND p.user_id <> :user_id';
 }
-$get_pets .= ' LIMIT :offset, :items_per_page';
-$get_stmt = $conn->prepare($get_pets);
+$get_pets_paginated .= ' LIMIT :offset, :items_per_page';
+$get_stmt = $conn->prepare($get_pets_paginated);
 if ($is_authenticated) {
-    $get_stmt->bindValue(1, $_SESSION['user_id'], PDO::PARAM_INT);
+    $get_stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 }
 $get_stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $get_stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
 $get_stmt->execute();
 $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -294,74 +277,80 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 </div>
 
-                <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
-                    <?php foreach ($pets as $pet) : ?>
-                        <div class="col">
-                            <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
-                                <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                                    <div class="badge bg-success mt-3">For Adoption</div>
-                                    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                                        <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
-                                        <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
-                                        <p class="pet-breed" style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
-                                        <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
-                                        <p class="pet-age" style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
-                                        <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
-                                        <ul class="d-flex list-unstyled mt-auto">
-                                            <li class="me-auto">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                                            </li>
-                                            <li class="d-flex align-items-center me-6">
-                                                <svg class="bi me-2" width="1em" height="1em">
-                                                    <use xlink:href="#geo-fill" />
-                                                </svg>
-                                                <small><?php echo $pet['owner_name'] ?></small>
-                                            </li>
-                                            <li class="d-flex align-items-center">
-                                                <svg class="bi me-2" width="1em" height="1em">
-                                                    <use xlink:href="#calendar3" />
-                                                </svg>
-                                                <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
-                                            </li>
-                                        </ul>
-                                        <?php if ($is_authenticated) : ?>
-                                            <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
-                                            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-                                            <?php
-                                            $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
-                                            $stmt_check = $conn->prepare($check_requests);
-                                            $stmt_check->execute([$_SESSION['user_id']]);
-                                            $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
-                                            ?>
-                                            <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
-                                        <?php endif; ?>
+                <?php if (empty($pets)) : ?>
+                    <div style="border: 2px solid #704130; padding: 20px;">
+                        <h1 style="text-align: center; font-weight: bold; color: brown;">No pets available</h1>
+                    </div>
+                <?php else : ?>
+                    <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+                        <?php foreach ($pets as $pet) : ?>
+                            <div class="col">
+                                <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
+                                    <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+                                        <div class="badge bg-success mt-3">For Adoption</div>
+                                        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                                            <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
+                                            <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
+                                            <p class="pet-breed" style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
+                                            <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
+                                            <p class="pet-age" style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
+                                            <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
+                                            <ul class="d-flex list-unstyled mt-auto">
+                                                <li class="me-auto">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                                </li>
+                                                <li class="d-flex align-items-center me-6">
+                                                    <svg class="bi me-2" width="1em" height="1em">
+                                                        <use xlink:href="#geo-fill" />
+                                                    </svg>
+                                                    <small><?php echo $pet['owner_name'] ?></small>
+                                                </li>
+                                                <li class="d-flex align-items-center">
+                                                    <svg class="bi me-2" width="1em" height="1em">
+                                                        <use xlink:href="#calendar3" />
+                                                    </svg>
+                                                    <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
+                                                </li>
+                                            </ul>
+                                            <?php if ($is_authenticated) : ?>
+                                                <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
+                                                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                                <?php
+                                                $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
+                                                $stmt_check = $conn->prepare($check_requests);
+                                                $stmt_check->execute([$_SESSION['user_id']]);
+                                                $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
+                                                ?>
+                                                <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                                </form>
+                            </div>
+                        <?php endforeach; ?>
+
+                    </div>
 
 
-                <!-- PAGINATION -->
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item<?php if ($current_page <= 1) echo ' disabled'; ?>">
-                            <a class="page-link" href="?page=<?php echo max(1, $current_page - 1); ?>" tabindex="-1" aria-disabled="true">Previous</a>
-                        </li>
-                        <?php
-                        $total_pages = ceil($total_items / $items_per_page);
-                        for ($i = 1; $i <= $total_pages; $i++) : ?>
-                            <li class="page-item<?php if ($i == $current_page) echo ' active'; ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    <!-- PAGINATION -->
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item<?php if ($current_page <= 1) echo ' disabled'; ?>">
+                                <a class="page-link" href="?page=<?php echo max(1, $current_page - 1); ?>" tabindex="-1" aria-disabled="true">Previous</a>
                             </li>
-                        <?php endfor; ?>
-                        <li class="page-item<?php if ($current_page >= $total_pages) echo ' disabled'; ?>">
-                            <a class="page-link" href="?page=<?php echo min($total_pages, $current_page + 1); ?>">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-
+                            <?php
+                            $total_pages = ceil($total_items / $items_per_page);
+                            for ($i = 1; $i <= $total_pages; $i++) : ?>
+                                <li class="page-item<?php if ($i == $current_page) echo ' active'; ?>">
+                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            <li class="page-item<?php if ($current_page >= $total_pages) echo ' disabled'; ?>">
+                                <a class="page-link" href="?page=<?php echo min($total_pages, $current_page + 1); ?>">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif ?>
             </div>
         </div>
 

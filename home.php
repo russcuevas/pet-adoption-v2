@@ -191,7 +191,7 @@ if ($is_authenticated) {
         <div class="row mb-2">
             <?php if (empty($announcements)) : ?>
                 <div style="border: 2px solid #704130; padding: 20px;">
-                    <h1 style="text-align: center; font-weight: bold;">No news and announcements posted</h1>
+                    <h1 style="text-align: center; font-weight: bold; color: brown;">No news and announcements posted</h1>
                 </div>
             <?php else : ?>
                 <?php foreach ($announcements as $announcement) : ?>
@@ -222,54 +222,62 @@ if ($is_authenticated) {
         <br>
 
         <h2 class="pb-2">List of Available Pets</h2>
-        <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
-            <?php foreach ($pets as $pet) : ?>
-                <div class="col">
-                    <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
-                        <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
-                            <div class="badge bg-success mt-3">For Adoption</div>
-                            <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                                <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
-                                <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
-                                <p class="pet-breed" style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
-                                <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
-                                <p class="pet-age" style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
-                                <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
-                                <ul class="d-flex list-unstyled mt-auto">
-                                    <li class="me-auto">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
-                                    </li>
-                                    <li class="d-flex align-items-center me-6">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#geo-fill" />
-                                        </svg>
-                                        <small><?php echo $pet['owner_name'] ?></small>
-                                    </li>
-                                    <li class="d-flex align-items-center">
-                                        <svg class="bi me-2" width="1em" height="1em">
-                                            <use xlink:href="#calendar3" />
-                                        </svg>
-                                        <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
-                                    </li>
-                                </ul>
-                                <?php if ($is_authenticated) : ?>
-                                    <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
-                                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-                                    <?php
-                                    $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
-                                    $stmt_check = $conn->prepare($check_requests);
-                                    $stmt_check->execute([$_SESSION['user_id']]);
-                                    $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
-                                    ?>
-                                    <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
-                                <?php endif; ?>
+        <?php if (empty($pets)) : ?>
+            <div style="border: 2px solid #704130; padding: 20px;">
+                <h1 style="text-align: center; font-weight: bold; color: brown;">No pets available</h1>
+            </div>
+        <?php else : ?>
+            <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+                <?php foreach ($pets as $pet) : ?>
+                    <div class="col">
+                        <form class="adoptForm" action="ajax/adoption.php" method="POST" id="adoptForm_<?php echo $pet['pet_id']; ?>">
+                            <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+                                <div class="badge bg-success mt-3">For Adoption</div>
+                                <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                                    <img style="border-radius: 50px; height: 200px;" src="images/pet-images/<?php echo $pet['pet_image'] ?>" alt="">
+                                    <h3 style="font-size: 20px;" class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">Type: <?php echo $pet['pet_type'] ?></h3>
+                                    <p class="pet-breed" style="font-size: 20px; margin: 0px !important;">Breed: <?php echo $pet['pet_breed'] ?></p>
+                                    <p style="font-size: 20px; margin: 0px !important;">Name: <?php echo $pet['pet_name'] ?></p>
+                                    <p class="pet-age" style="font-size: 20px; margin: 0px !important;">Age: <?php echo $pet['pet_age'] ?></p>
+                                    <p style="font-size: 20px;">Condition: <?php echo $pet['pet_condition'] ?></p>
+                                    <ul class="d-flex list-unstyled mt-auto">
+                                        <li class="me-auto">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                        </li>
+                                        <li class="d-flex align-items-center me-6">
+                                            <svg class="bi me-2" width="1em" height="1em">
+                                                <use xlink:href="#geo-fill" />
+                                            </svg>
+                                            <small><?php echo $pet['owner_name'] ?></small>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <svg class="bi me-2" width="1em" height="1em">
+                                                <use xlink:href="#calendar3" />
+                                            </svg>
+                                            <small><?php echo date('Y-m-d', strtotime($pet['created_at'])) ?></small>
+                                        </li>
+                                    </ul>
+                                    <?php if ($is_authenticated) : ?>
+                                        <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id']; ?>">
+                                        <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                        <?php
+                                        $check_requests = "SELECT COUNT(*) AS num_requests FROM tbl_adoption WHERE user_id = ? AND remarks = 'Requesting'";
+                                        $stmt_check = $conn->prepare($check_requests);
+                                        $stmt_check->execute([$_SESSION['user_id']]);
+                                        $num_requests = $stmt_check->fetch(PDO::FETCH_ASSOC)['num_requests'];
+                                        ?>
+                                        <button type="submit" id="adoptButton_<?php echo $pet['pet_id']; ?>" style="background-color: #704130 !important; border: none;" class="btn btn-primary<?php echo ($num_requests > 0) ? ' d-none' : ''; ?>">Adopt</button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <a style="display: flex; align-items: center; justify-content: center;" href="adopt.php">View all</a>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif ?>
+            </div>
+            <?php if (!empty($pets)) : ?>
+                <a style="display: flex; align-items: center; justify-content: center;" href="adopt.php">View all</a>
+            <?php endif ?>
     </div>
 
     <!-- FOOTER -->
@@ -282,10 +290,73 @@ if ($is_authenticated) {
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.adoptForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var form = $(this);
+                var formData = form.serialize();
+                var submitButton = form.find('[type=submit]');
+                var petId = form.attr('id').replace('adoptForm_', '');
+
+                Swal.fire({
+                    title: 'Confirm Adoption',
+                    text: 'Are you sure you want to request an adoption for this pet?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, adopt!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'ajax/adoption.php',
+                            type: 'POST',
+                            data: formData,
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log(response);
+                                if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(xhr.responseText);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Failed to submit adopt request. Please try again.',
+                                    confirmButtonText: 'OK'
+                                });
+                            },
+                            beforeSend: function() {
+                                submitButton.prop('disabled', true);
+                            },
+                            complete: function() {
+                                submitButton.prop('disabled', false);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 
