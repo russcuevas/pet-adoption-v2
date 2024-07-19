@@ -34,6 +34,14 @@ $restult_total_pets_approval = $stmt_total_pets_approval->fetch(PDO::FETCH_ASSOC
 $total_pets_approval = $restult_total_pets_approval['total_pets_approval'];
 // END GET TOTAL PETS APPROVAL
 
+// GET THE TOTAL REPORTS
+$get_total_reports = "SELECT COUNT(*) AS total_reports FROM `tbl_reports`";
+$stmt_total_reports = $conn->prepare($get_total_reports);
+$stmt_total_reports->execute();
+$result_total_reports = $stmt_total_reports->fetch(PDO::FETCH_ASSOC);
+$total_reports = $result_total_reports['total_reports'];
+// END GET TOTAL REPORTS
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -146,7 +154,7 @@ $total_pets_approval = $restult_total_pets_approval['total_pets_approval'];
                     <div class="col col-stats ms-3 ms-sm-0">
                       <div class="numbers">
                         <p class="card-category">Reports</p>
-                        <h4 class="card-title">576</h4>
+                        <h4 class="card-title"><?php echo $total_reports ?></h4>
                       </div>
                     </div>
                   </div>

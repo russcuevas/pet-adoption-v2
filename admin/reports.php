@@ -1,3 +1,19 @@
+<?php
+include '../database/connection.php';
+
+// SESSION IF NOT LOGIN YOU CANT GO TO DIRECT PAGE
+session_start();
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+// DISPLAY REPORTS
+$get_reports = "SELECT * FROM `tbl_reports`";
+$get_stmt = $conn->query($get_reports);
+$reports = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
+// END REPORTS
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -74,40 +90,34 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span>Russel Vincent Cuevas</span> <br>
-                                                        <span>Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span>09495748302</span> <br>
-                                                        <span>russelcuevas0@gmail.com</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>
-                                                            Tiger
-                                                        </span> <br>
-                                                        <span>
-                                                            Dog
-                                                        </span> <br>
-                                                        <span>
-                                                            Labrador <br>
-                                                        </span>
-                                                        <span>
-                                                            Bawal sa malamig
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Russel Vincent Cuevas</span> <br>
-                                                        <span>Calingatan Mataasnakahoy Batangas</span> <br>
-                                                        <span>09495748302</span> <br>
-                                                        <span>russelcuevas0@gmail.com</span>
-                                                    </td>
-                                                    <td>
-                                                        <span style="font-size: 10px;">November 23 2024 / 7:00am</span>
-                                                    </td>
-                                                    <td>
-                                                        <span style="color: green;">Completed</span>
-                                                    </td>
-                                                </tr>
+                                                <?php foreach ($reports as $report) : ?>
+                                                    <tr>
+                                                        <td>
+                                                            <span><?php echo $report['owner_fullname'] ?></span> <br>
+                                                            <span><?php echo $report['owner_address'] ?></span> <br>
+                                                            <span><?php echo $report['owner_contact'] ?></span> <br>
+                                                            <span><?php echo $report['owner_email'] ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span><?php echo $report['pet_name'] ?></span> <br>
+                                                            <span><?php echo $report['pet_type'] ?></span> <br>
+                                                            <span><?php echo $report['pet_breed'] ?></span> <br>
+                                                            <span><?php echo $report['pet_condition'] ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span><?php echo $report['adoptor_fullname'] ?></span> <br>
+                                                            <span><?php echo $report['adoptor_address'] ?></span> <br>
+                                                            <span><?php echo $report['adoptor_contact'] ?></span> <br>
+                                                            <span><?php echo $report['adoptor_email'] ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span style="font-size: 10px;"><?= date('F j, Y / g:ia', strtotime($report['date'])) ?></span>
+                                                        </td>
+                                                        <td>
+                                                            <span style="color: green;"><?php echo $report['status'] ?></span>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach ?>
                                             </tbody>
                                         </table>
                                     </div>
