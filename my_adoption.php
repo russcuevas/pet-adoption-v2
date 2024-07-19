@@ -263,7 +263,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="filter-my-posted">
                                     <div class="col-md-4 mb-3">
                                         <label for="posted-filter" class="form-label">Status:</label>
-                                        <select class="form-select" id="posted-filter">
+                                        <select style="border: 2px solid grey;" class="form-select" id="posted-filter">
                                             <option value="">All status</option>
                                             <option value="For adoption">For adoption</option>
                                             <option value="Requesting">Requesting</option>
@@ -313,7 +313,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="filter">
                                         <div class="col-md-4 mb-3">
                                             <label for="adopted-filter" class="form-label">Status:</label>
-                                            <select class="form-select" id="adopted-filter">
+                                            <select style="border: 2px solid grey;" class="form-select" id="adopted-filter">
                                                 <option value="">All status</option>
                                                 <option value="Requesting">Requesting</option>
                                                 <option value="Ready to pick up">Ready to pick up</option>

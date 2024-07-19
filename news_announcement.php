@@ -118,8 +118,10 @@ $announcements = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="row mb-2">
                 <?php if (empty($announcements)) : ?>
-                    <div style="border: 2px solid #704130; padding: 20px;">
-                        <h1 style="text-align: center; font-weight: bold; color: brown;">No news and announcements posted</h1>
+                    <div style="padding: 5px;">
+                        <div style="border: 2px solid #704130; padding: 20px;">
+                            <h1 style="text-align: center; font-weight: bold; color: brown;">No news and announcements posted</h1>
+                        </div>
                     </div>
                 <?php else : ?>
                     <?php foreach ($announcements as $announcement) : ?>
