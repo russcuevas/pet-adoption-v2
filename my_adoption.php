@@ -1,23 +1,33 @@
 <?php
 include 'database/connection.php';
 
-session_start();
-
 // DISPLAY FULLNAME IF LOGGED IN
+session_start();
 $is_authenticated = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
 
-// Get user's full name if authenticated
-$fullname = '';
+if (!$is_authenticated) {
+    header('Location: login.php');
+    exit();
+}
+
 if ($is_authenticated) {
     $user_id = $_SESSION['user_id'];
-    $get_user = "SELECT fullname FROM `tbl_users` WHERE user_id = ?";
+    $get_user = "SELECT fullname, email, contact, address FROM `tbl_users` WHERE user_id = ?";
     $stmt = $conn->prepare($get_user);
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user) {
-        $fullname = $user['fullname'];
+        $_SESSION['user_fullname'] = $user['fullname'];
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_contact'] = $user['contact'];
+        $_SESSION['user_address'] = $user['address'];
+    } else {
+        $is_authenticated = false;
     }
 }
+
+$fullname = isset($_SESSION['user_fullname']) ? $_SESSION['user_fullname'] : '';
+
 
 // READ POSTED PETS
 $pets = [];
@@ -247,14 +257,15 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-8 mt-5">
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                            <div class="box" style="border: 2px solid brown; padding: 20px;">
-                                <div class="filter">
+                            <div class="box mb-5" style="border: 2px solid brown; padding: 20px;">
+                                <div class="filter-my-posted">
                                     <div class="col-md-4 mb-3">
-                                        <label for="type-filter" class="form-label">Status:</label>
-                                        <select class="form-select" id="type-filter">
+                                        <label for="posted-filter" class="form-label">Status:</label>
+                                        <select class="form-select" id="posted-filter">
                                             <option value="">All status</option>
-                                            <option value="for adoption">For adoption</option>
-                                            <option value="requesting">Requesting</option>
+                                            <option value="For adoption">For adoption</option>
+                                            <option value="Requesting">Requesting</option>
+                                            <option value="Already adopt">Already adopt</option>
                                         </select>
                                     </div>
                                 </div>
@@ -296,7 +307,18 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
                             <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                                <div class="box" style="border: 2px solid brown; padding: 20px;">
+                                <div class="box mb-5" style="border: 2px solid brown; padding: 20px;">
+                                    <div class="filter">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="adopted-filter" class="form-label">Status:</label>
+                                            <select class="form-select" id="adopted-filter">
+                                                <option value="">All status</option>
+                                                <option value="Requesting">Requesting</option>
+                                                <option value="Ready to pick up">Ready to pick up</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="table-responsive">
                                         <table id="example2" class="table table-dark table-hover table-striped table-bordered">
                                             <thead class="table-secondary">
@@ -343,7 +365,15 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                             <?php echo $detail['adopted_user_email']; ?>
                                                         </td>
                                                         <td><?php echo $detail['adoption_date']; ?></td>
-                                                        <td><?php echo $detail['adoption_status']; ?></td>
+                                                        <td>
+                                                            <?php if ($detail['adoption_status'] === 'Completed') : ?>
+                                                                <span style="color: green; font-weight: 900;"><?php echo $detail['adoption_status']; ?></span>
+                                                            <?php elseif ($detail['adoption_status'] === 'Requesting') : ?>
+                                                                <span style="color: orange; font-weight: 900;"><?php echo $detail['adoption_status']; ?></span>
+                                                            <?php else : ?>
+                                                                <span style="color: red; font-weight: 900;"><?php echo $detail['adoption_status']; ?></span>
+                                                            <?php endif ?>
+                                                        </td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>
@@ -354,7 +384,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
                             <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                                <div class="box" style="border: 2px solid brown; padding: 20px;">
+                                <div class="box mb-5" style="border: 2px solid brown; padding: 20px;">
                                     <div class="table-responsive">
                                         <table id="example3" class="table table-dark table-hover table-striped table-bordered">
                                             <thead class="table-secondary">
@@ -621,7 +651,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 "info": false,
                 "paging": true,
                 "bLengthChange": false,
-                "searching": false,
+                "searching": true,
             });
         });
 
@@ -632,7 +662,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 "info": false,
                 "paging": true,
                 "bLengthChange": false,
-                "searching": false,
+                "searching": true,
             });
         });
 
@@ -643,7 +673,7 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 "info": false,
                 "paging": true,
                 "bLengthChange": false,
-                "searching": false,
+                "searching": true,
             });
         });
 
@@ -654,11 +684,45 @@ $to_pick_up = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 "info": false,
                 "paging": true,
                 "bLengthChange": false,
-                "searching": false,
+                "searching": true,
             });
         });
     </script>
 
+
+    <!-- FILTER MY POSTED -->
+    <script>
+        document.getElementById('posted-filter').addEventListener('change', function() {
+            var selectedStatus = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#example tbody tr');
+
+            rows.forEach(function(row) {
+                var status = row.querySelector('td:nth-child(7) p').textContent.toLowerCase();
+                if (selectedStatus === '' || status.includes(selectedStatus)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <!-- FILTER MY ADOPTED -->
+    <script>
+        document.getElementById('adopted-filter').addEventListener('change', function() {
+            var selectedStatus = this.value;
+            var rows = document.querySelectorAll('#example2 tbody tr');
+
+            rows.forEach(function(row) {
+                var status = row.querySelector('td:nth-child(5) span').textContent;
+                if (selectedStatus === '' || status === selectedStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
