@@ -8,6 +8,12 @@ if (!isset($admin_id)) {
   header('location:admin_login.php');
 }
 
+// GET ADMIN
+$admin_id = $_SESSION['admin_id'];
+$fetch_admin = $conn->prepare("SELECT * FROM `tbl_admin` WHERE admin_id = ?");
+$fetch_admin->execute([$admin_id]);
+$admin = $fetch_admin->fetch(PDO::FETCH_ASSOC);
+
 // CREATE ADMIN
 if (isset($_POST['submit'])) {
   $fullname = $_POST['fullname'];

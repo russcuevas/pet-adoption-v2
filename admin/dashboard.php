@@ -10,6 +10,12 @@ if (!isset($admin_id)) {
   header('location:admin_login.php');
 }
 
+// GET ADMIN
+$admin_id = $_SESSION['admin_id'];
+$fetch_admin = $conn->prepare("SELECT * FROM `tbl_admin` WHERE admin_id = ?");
+$fetch_admin->execute([$admin_id]);
+$admin = $fetch_admin->fetch(PDO::FETCH_ASSOC);
+
 // GET THE USERS
 $get_total_users = "SELECT COUNT(*) AS total_users FROM `tbl_users`";
 $stmt_total_users = $conn->prepare($get_total_users);

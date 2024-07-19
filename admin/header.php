@@ -97,7 +97,7 @@
           <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
             <span class="profile-username">
               <span style="color: white !important;" class="op-7">Hi,</span>
-              <span style="color: white !important;" class="fw-bold">Russel</span>
+              <span style="color: white !important;" class="fw-bold"><?php echo $admin['fullname'] ?></span>
             </span>
           </a>
           <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -105,8 +105,8 @@
               <li>
                 <div class="user-box">
                   <div class="u-text">
-                    <h4>Russel</h4>
-                    <p class="text-muted">hello@example.com</p>
+                    <h4><?php echo $admin['fullname'] ?></h4>
+                    <p class="text-muted"><?php echo $admin['email'] ?></p>
                   </div>
                 </div>
               </li>

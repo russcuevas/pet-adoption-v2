@@ -8,6 +8,12 @@ if (!isset($admin_id)) {
     header('location:admin_login.php');
 }
 
+// GET ADMIN
+$admin_id = $_SESSION['admin_id'];
+$fetch_admin = $conn->prepare("SELECT * FROM `tbl_admin` WHERE admin_id = ?");
+$fetch_admin->execute([$admin_id]);
+$admin = $fetch_admin->fetch(PDO::FETCH_ASSOC);
+
 // DISPLAY REPORTS
 $get_reports = "SELECT * FROM `tbl_reports`";
 $get_stmt = $conn->query($get_reports);
@@ -69,11 +75,13 @@ $reports = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="card-header">
                                     <div class="d-flex align-items-center">
                                         <h4 class="card-title"></h4>
-                                        <button class="btn btn-primary btn-round ms-auto" onclick="window.open('print/print_report.php', '_blank', 'width=800,height=600')">
-                                            <i class="fas fa-file"></i> &nbsp;
-                                            Download for Print
-                                        </button>
-
+                                        <?php if (empty($report)) : ?>
+                                        <?php else : ?>
+                                            <button class="btn btn-primary btn-round ms-auto" onclick="window.open('print/print_report.php', '_blank', 'width=800,height=600')">
+                                                <i class="fas fa-file"></i> &nbsp;
+                                                Download for Print
+                                            </button>
+                                        <?php endif ?>
                                     </div>
                                 </div>
                                 <div class="card-body">

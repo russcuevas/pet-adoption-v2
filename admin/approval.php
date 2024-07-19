@@ -9,6 +9,12 @@ if (!isset($admin_id)) {
     header('location:admin_login.php');
 }
 
+// GET ADMIN
+$admin_id = $_SESSION['admin_id'];
+$fetch_admin = $conn->prepare("SELECT * FROM `tbl_admin` WHERE admin_id = ?");
+$fetch_admin->execute([$admin_id]);
+$admin = $fetch_admin->fetch(PDO::FETCH_ASSOC);
+
 // FETCH THE APPROVAL
 $get_pets = 'SELECT p.pet_id, p.pet_name, p.pet_age, p.pet_type, p.pet_breed, p.pet_condition, p.pet_status, p.pet_image, p.created_at,
                u.fullname AS owner_name, u.address AS owner_address, u.contact AS owner_contact, u.email AS owner_email
