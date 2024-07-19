@@ -35,6 +35,7 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="login-assets/css/owl.carousel.min.css">
     <link rel="stylesheet" href="login-assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="login-assets/css/style.css">
+    <link rel="icon" href="../images/home/pet-logo.png" type="image/x-icon" />
 
     <title>Admin Login</title>
     <style>
