@@ -25,6 +25,31 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="images/home/pet-logo.png" type="image/x-icon" />
+    <style>
+        .contact-section {
+            background-color: #f8f9fa;
+            padding: 50px 0;
+        }
+
+        .contact-info {
+            padding: 20px;
+        }
+
+        .map-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
+        }
+
+        .map-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+    </style>
 
 </head>
 
@@ -45,7 +70,7 @@ if (isset($_SESSION['user_id'])) {
                             <a class="nav-link" href="home.php">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="about.php">About</a>
+                            <a class="nav-link" href="about.php">About</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="adopt.php">Adopt</a>
@@ -54,7 +79,7 @@ if (isset($_SESSION['user_id'])) {
                             <a class="nav-link" href="news_announcement.php">News & Announcement</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contact.php">Contact</a>
+                            <a class="nav-link active" href="contact.php">Contact</a>
                         </li>
                         <li class="nav-item dropdown" style="background-color: black; border-radius: 50px;">
                             <?php
@@ -90,39 +115,24 @@ if (isset($_SESSION['user_id'])) {
     </header>
 
 
-    <!-- NEWS & ANNOUNCEMENT SECTION -->
-    <div class="news-section">
+    <!-- CONTACT SECTION -->
+    <div class="contact-section">
         <div class="container">
-            <h1 class="mt-5" style="text-align: center;">About Us</h1>
-            <p class="lead" style="text-align: justify;">We are dedicated to rescuing and finding loving homes for abandoned and mistreated pets. Our commitment extends beyond adoption; we rehabilitate each animal, providing medical care, training, and affection until they are ready for their forever families. Through education and community outreach, we advocate for responsible pet ownership, striving to reduce homelessness among pets in our community. Our ultimate goal is to ensure every pet receives the love and care they deserve, creating happier lives for both animals and their human companions.</p>
-
-            <hr class="featurette-divider">
-
-            <!-- Mission Section -->
-            <div class="row featurette">
-                <div class="col-md-7">
-                    <h2 class="featurette-heading fw-normal lh-1">Mission</h2>
-                    <p class="lead" style="text-align: justify;">Our mission is to rescue and find loving homes for abandoned and mistreated pets. We strive to rehabilitate each animal, providing them with medical care, training, and affection until they are ready to be adopted into caring families. Through education and community outreach, we advocate for responsible pet ownership and strive to reduce the number of homeless pets in our community. Our ultimate goal is to ensure that every pet receives the love and care they deserve, creating happier lives for both animals and their human companions.</p>
+            <div class="row">
+                <div style="border: 2px solid #704130; border-radius: 50px;" class="col-md-6 contact-info">
+                    <h2>Contact Us</h2>
+                    <p class="lead mt-5">Pet-Ko.</p>
+                    <hr>
+                    <p class="lead">Email: info@petkosystem</p>
+                    <p class="lead">Location: Calingatan Mataasnakahoy Batangas</p>
+                    <p class="lead">Phone: 0968-574-8302</p>
                 </div>
-                <div class="col-md-5">
-                    <img src="https://i3.cpcache.com/product/977275538/pets_adoption_saves_lifes_banner.jpg?height=630&width=630&qv=90" class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" role="img" aria-label="Mission Image" alt="Mission Image">
-                </div>
-            </div>
-
-            <hr class="featurette-divider">
-
-            <!-- Vision Section -->
-            <div class="row featurette">
-                <div class="col-md-7 order-md-2">
-                    <h2 class="featurette-heading fw-normal lh-1">Vision</h2>
-                    <p class="lead" style="text-align: justify;">Our vision is a world where every pet has a loving and caring home, free from neglect and cruelty. We envision communities where pet adoption is the preferred choice, where all pets are seen as valuable members of families. Through innovative programs and partnerships, we aim to create sustainable solutions to pet overpopulation and abandonment. By fostering a culture of compassion and responsibility, we believe we can make a significant impact on the lives of animals, ensuring they live in environments filled with love, respect, and dignity.</p>
-                </div>
-                <div class="col-md-5 order-md-1">
-                    <img src="https://i3.cpcache.com/product/977275538/pets_adoption_saves_lifes_banner.jpg?height=630&width=630&qv=90" class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" role="img" aria-label="Vision Image" alt="Vision Image">
+                <div class="col-md-6">
+                    <div class="map-responsive">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12345.6789123456!2d121.0828023!3d13.9501234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd7b9b7a32b2d7%3A0xd19f50a3cd9e8e73!2sCalingatan%2C%20Mataasnakahoy%2C%20Batangas%2C%20Philippines!5e0!3m2!1sen!2sus!4v1600332418016!5m2!1sen!2sus" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                    </div>
                 </div>
             </div>
-
-            <hr class="featurette-divider">
         </div>
     </div>
 

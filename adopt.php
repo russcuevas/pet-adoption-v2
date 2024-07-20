@@ -176,7 +176,7 @@ $pets = $get_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <a class="nav-link" href="news_announcement.php">News & Announcement</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#footer">Contact</a>
+                            <a class="nav-link" href="contact.php">Contact</a>
                         </li>
                         <li class="nav-item dropdown" style="background-color: black; border-radius: 50px;">
                             <?php

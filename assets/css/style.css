@@ -69,6 +69,13 @@
 
 /* END NEWS AND ANNOUNCEMENT */
 
+/* CONTACT */
+.contact-section {
+    height: 100vh;
+}
+
+/* END CONTACT */
+
 /* ADOPTPAGE */
 
 .adopt-section {
@@ -125,5 +132,12 @@
     }
 
     /* END ADOPT SECTION */
+
+    /* CONTACT SECTION */
+    .contact-section {
+        height: 100vh;
+    }
+
+    /* END CONTACT */
 
 }

@@ -128,8 +128,6 @@ if (isset($_POST['delete'])) {
                                                     <th>Pet Description</th>
                                                     <th>Pet Age</th>
                                                     <th style="width: 10%">Status</th>
-                                                    <th style="width: 10%">Action</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -143,37 +141,6 @@ if (isset($_POST['delete'])) {
                                                         <td><?php echo $pet['pet_age']; ?></td>
                                                         <td>
                                                             <p style="font-size: 13px; font-weight: 900; color: green; "><?php echo $pet['pet_status'] ?></p>
-                                                        </td>
-                                                        <td>
-                                                            <div class="form-button-action">
-                                                                <a href="" data-bs-toggle="modal" data-bs-target="#delete_<?php echo $pet['pet_id']; ?>" class="btn btn-link btn-danger btn-lg">
-                                                                    <i class="fa fa-times"></i>
-                                                                </a>
-                                                            </div>
-
-                                                            <!-- DELETE MODAL -->
-                                                            <div class="modal fade" id="delete_<?php echo $pet['pet_id'] ?>" tabindex="-1" role="dialog" aria-hidden="true">
-                                                                <div class="modal-dialog" role="document">
-                                                                    <div class="modal-content">
-                                                                        <form action="" method="POST">
-                                                                            <div class="modal-header">
-                                                                                <h5 class="modal-title">Delete Pet</h5>
-                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                            </div>
-                                                                            <div class="modal-body">
-                                                                                <input type="hidden" name="pet_id" value="<?php echo $pet['pet_id'] ?>">
-                                                                                <p>Are you sure you want to delete the pet "<?php echo $pet['pet_name']; ?>"?</p>
-                                                                            </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit" class="btn btn-danger" name="delete">Delete</button>
-                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <!-- END DELETE MODAL -->
-
                                                         </td>
                                                     </tr>
                                                 <?php endforeach ?>
